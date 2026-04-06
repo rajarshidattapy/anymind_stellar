@@ -25,7 +25,7 @@ from anymind import Agent
 agent = Agent(
     agent_id="your-agent-id",
     chat_id="your-chat-id",
-    wallet_address="YourSolanaWalletAddress",
+    wallet_address="YourStellarWalletAddress",
     base_url="http://localhost:8000"  # Optional: defaults to localhost:8000
 )
 

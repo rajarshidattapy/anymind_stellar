@@ -13,7 +13,7 @@ import {
   BookOpen,
   Zap
 } from 'lucide-react';
-import appLogo from '../assets/app-logo.png';
+import appLogo from '../assets/stellarmind.png';
 
 export default function DevelopersPage() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);

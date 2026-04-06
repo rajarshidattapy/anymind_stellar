@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useStellarWallet } from '../contexts/StellarWalletContext';
 import {
   MessageSquare,
@@ -15,8 +14,8 @@ import {
   Github,
   ExternalLink,
 } from "lucide-react";
-import solanaLogo from "../assets/solana-logo.png";
-import appLogo from "../assets/app-logo.png";
+import stellarLogo from "../assets/stellar.png";
+import appLogo from "../assets/stellarmind.png";
 import { useSolanaBalance } from "../hooks/useSolanaBalance";
 
 export default function LandingPage() {
@@ -62,6 +61,8 @@ export default function LandingPage() {
     await connectStellarWallet();
   };
 
+  const hasWalletSession = stellarConnected || connected;
+
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
       <header className="fixed top-0 w-full z-50 border-b border-gray-800 bg-gray-900/80 backdrop-blur-md">
@@ -86,9 +87,9 @@ export default function LandingPage() {
               <div className="relative" ref={stellarDisconnectRef}>
                 <button
                   onClick={() => setShowStellarDisconnect(!showStellarDisconnect)}
-                  className="border border-green-500/40 bg-green-500/10 text-green-300 px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-green-500/20"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
-                  Stellar {shortenAddress(stellarAddress)}
+                  {shortenAddress(stellarAddress)}
                 </button>
                 {showStellarDisconnect && (
                   <div className="absolute top-full right-0 mt-1 z-50">
@@ -104,21 +105,12 @@ export default function LandingPage() {
                   </div>
                 )}
               </div>
-            ) : (
-              <button
-                onClick={() => void handleStellarConnect()}
-                disabled={stellarConnecting}
-                className="border border-green-500/40 bg-green-500/10 text-green-300 px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-green-500/20 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {stellarConnecting ? 'Connecting...' : 'Connect Stellar'}
-              </button>
-            )}
-            {connected && publicKey ? (
+            ) : connected && publicKey ? (
               <div className="flex items-center gap-3">
                 <div className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 flex items-center gap-2">
-                  <img src={solanaLogo} alt="SOL" className="w-4 h-4" />
+                  <img src={stellarLogo} alt="XLM" className="w-4 h-4" />
                   <span className="text-sm font-medium text-white">
-                    {loading ? '...' : `${balance?.toFixed(4) ?? '0'} SOL`}
+                    {loading ? '...' : `${balance?.toFixed(4) ?? '0'} XLM`}
                   </span>
                 </div>
                 <div className="relative" ref={disconnectRef}>
@@ -144,7 +136,13 @@ export default function LandingPage() {
                 </div>
               </div>
             ) : (
-              <WalletMultiButton className="!bg-blue-600 hover:!bg-blue-700 !text-white !px-4 !py-2 !rounded-lg !text-sm !font-medium !transition-colors !h-auto" />
+              <button
+                onClick={() => void handleStellarConnect()}
+                disabled={stellarConnecting}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {stellarConnecting ? 'Opening Wallets...' : 'Select Wallet'}
+              </button>
             )}
           </div>
         </div>
@@ -153,18 +151,18 @@ export default function LandingPage() {
       <main className="pt-32 pb-20">
         <section className="container mx-auto px-6 text-center mb-32">
           <div className="inline-flex items-center gap-2 mb-6 py-1 px-3 border border-blue-600/20 bg-blue-600/5 text-blue-400 rounded-full text-sm">
-            <img src={solanaLogo} alt="Solana" className="w-4 h-4" />
-            v1 live on Solana testnet
+            <img src={stellarLogo} alt="Stellar" className="w-8 h-8 object-contain" />
+            v1 live on Stellar testnet
           </div>
           <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 max-w-4xl mx-auto leading-tight">
             Turn AI conversations into <span className="text-blue-400">on-chain intelligence.</span>
           </h1>
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
-            Anymind is an AI intelligence marketplace powered by Solana and Stellar. Chat with agents, package long-term intelligence
+            Anymind is an AI intelligence marketplace powered by Stellar. Chat with agents, package long-term intelligence
             into capsules, and monetize them with x402 micropayments in USDC — zero gas fees for buyers.
           </p>
           <div className="flex flex-row items-center justify-center gap-6 mt-8">
-            {connected ? (
+            {hasWalletSession ? (
               <Link
                 to="/app"
                 className="bg-white text-blue-600 font-medium px-8 py-3 rounded-md shadow hover:bg-blue-50 transition-colors border border-white focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -172,7 +170,13 @@ export default function LandingPage() {
                 Enter App
               </Link>
             ) : (
-              <WalletMultiButton className="!bg-white !text-blue-600 !font-medium !px-8 !py-3 !rounded-md !shadow hover:!bg-blue-50 !transition-colors !border !border-white focus:!outline-none focus:!ring-2 focus:!ring-blue-300 !h-auto" />
+              <button
+                onClick={() => void handleStellarConnect()}
+                disabled={stellarConnecting}
+                className="bg-white text-blue-600 font-medium px-8 py-3 rounded-md shadow hover:bg-blue-50 transition-colors border border-white focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {stellarConnecting ? 'Opening Wallets...' : 'Select Wallet'}
+              </button>
             )}
             <Link
               to="/marketplace"
@@ -216,7 +220,7 @@ export default function LandingPage() {
                   </div>
                   <div className="flex gap-4 pl-4">
                     <span className="text-gray-500">5</span>
-                    &nbsp;&nbsp;&nbsp;&nbsp;wallet_address=<span className="text-green-400">"YourSolanaWalletAddress"</span>,
+                    &nbsp;&nbsp;&nbsp;&nbsp;wallet_address=<span className="text-green-400">"YourStellarWalletAddress"</span>,
                   </div>
                   <div className="flex gap-4 pl-4">
                     <span className="text-gray-500">6</span>
@@ -291,7 +295,7 @@ export default function LandingPage() {
               </p>
             </div>
             <button className="text-gray-400 hover:text-gray-100 transition-colors group">
-              Read the whitepaper <ArrowRight className="ml-2 w-4 h-4 inline group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="ml-2 w-4 h-4 inline group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
 
@@ -403,7 +407,7 @@ export default function LandingPage() {
                   name: "DeFi Alpha Hunter",
                   creator: "0xAlpha",
                   queries: "12.4k",
-                  staked: "450 SOL",
+                  staked: "450 XLM",
                   price: "0.005",
                   category: "Trading",
                 },
@@ -411,7 +415,7 @@ export default function LandingPage() {
                   name: "Legal Contract Analyzer",
                   creator: "LegalMind",
                   queries: "8.2k",
-                  staked: "320 SOL",
+                  staked: "320 XLM",
                   price: "0.01",
                   category: "Legal",
                 },
@@ -419,7 +423,7 @@ export default function LandingPage() {
                   name: "Code Review Assistant",
                   creator: "DevDAO",
                   queries: "24.1k",
-                  staked: "890 SOL",
+                  staked: "890 XLM",
                   price: "0.003",
                   category: "Development",
                 },

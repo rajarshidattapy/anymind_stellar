@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { TrendingUp, Users, Calendar, ArrowUpRight, ExternalLink } from 'lucide-react';
 import { useSolanaBalance } from '../hooks/useSolanaBalance';
 import { useWallet } from '@solana/wallet-adapter-react';
-import solanaLogo from '../assets/solana-logo.png';
+import stellarLogo from '../assets/stellar.png';
 
 const EarningsDashboard = () => {
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
@@ -89,11 +89,11 @@ const EarningsDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
             <div className="flex items-center space-x-2 mb-3">
-              <img src={solanaLogo} alt="SOL" className="h-5 w-5" />
+              <img src={stellarLogo} alt="XLM" className="h-5 w-5" />
               <span className="text-gray-400">Wallet Balance</span>
             </div>
             <div className="text-2xl font-bold text-white">
-              {loading ? '...' : connected ? `${balance?.toFixed(4) ?? '0'} SOL` : 'N/A'}
+              {loading ? '...' : connected ? `${balance?.toFixed(4) ?? '0'} XLM` : 'N/A'}
             </div>
             <div className="text-sm text-gray-400">{connected ? 'Connected' : 'Not connected'}</div>
           </div>
@@ -103,7 +103,7 @@ const EarningsDashboard = () => {
               <Calendar className="h-5 w-5 text-blue-400" />
               <span className="text-gray-400">Capsule Earnings</span>
             </div>
-            <div className="text-2xl font-bold text-white">{earningsData.thisMonth} SOL</div>
+            <div className="text-2xl font-bold text-white">{earningsData.thisMonth} XLM</div>
             <div className="text-sm text-gray-400">This month</div>
           </div>
 
@@ -122,7 +122,7 @@ const EarningsDashboard = () => {
               <span className="text-gray-400">Avg Revenue</span>
             </div>
             <div className="text-2xl font-bold text-white">0.00</div>
-            <div className="text-sm text-gray-400">SOL per query</div>
+            <div className="text-sm text-gray-400">XLM per query</div>
           </div>
         </div>
 
@@ -130,13 +130,13 @@ const EarningsDashboard = () => {
         {connected && publicKey && (
           <div className="mb-8">
             <a 
-              href={`https://explorer.solana.com/address/${publicKey.toBase58()}?cluster=devnet`}
+              href={`https://explorer.stellar.org/address/${publicKey.toBase58()}?cluster=devnet`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors"
             >
               <ExternalLink className="h-4 w-4 mr-2" />
-              View full transaction history on Solana Explorer
+              View full transaction history on Stellar Explorer
             </a>
           </div>
         )}
@@ -152,7 +152,7 @@ const EarningsDashboard = () => {
                   key={index}
                   className="bg-blue-500 rounded-t-sm flex-1 min-w-0 transition-all hover:bg-blue-400"
                   style={{ height: `${(data.earnings / 0.6) * 100}%` }}
-                  title={`Day ${data.day}: ${data.earnings.toFixed(3)} SOL`}
+                  title={`Day ${data.day}: ${data.earnings.toFixed(3)} XLM`}
                 ></div>
               ))}
             </div>
@@ -177,7 +177,7 @@ const EarningsDashboard = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-white font-semibold">{capsule.revenue} SOL</div>
+                    <div className="text-white font-semibold">{capsule.revenue} XLM</div>
                     <div className={`text-sm ${capsule.trend > 0 ? 'text-green-400' : 'text-red-400'}`}>
                       {capsule.trend > 0 ? '+' : ''}{capsule.trend}%
                     </div>
@@ -211,7 +211,7 @@ const EarningsDashboard = () => {
                       </div>
                     </td>
                     <td className="text-right py-3 text-white">{capsule.queries}</td>
-                    <td className="text-right py-3 text-green-400 font-semibold">{capsule.revenue} SOL</td>
+                    <td className="text-right py-3 text-green-400 font-semibold">{capsule.revenue} XLM</td>
                     <td className="text-right py-3">
                       <span className={`flex items-center justify-end space-x-1 ${
                         capsule.trend > 0 ? 'text-green-400' : 'text-red-400'

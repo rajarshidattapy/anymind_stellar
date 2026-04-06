@@ -4,7 +4,7 @@ import { Brain, Store, Wallet, Settings, MessageSquare, Coins, TrendingUp, Arrow
 import { useSolanaBalance } from '../hooks/useSolanaBalance';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useApiClient } from '../lib/api';
-import appLogo from '../assets/app-logo.png';
+import appLogo from '../assets/stellarmind.png';
 import InfoIcon from './InfoIcon';
 
 interface LLMConfig {

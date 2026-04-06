@@ -1,7 +1,7 @@
 import { TrendingUp, Plus, ArrowUpRight, ArrowDownLeft, ExternalLink } from 'lucide-react';
 import { useSolanaBalance } from '../hooks/useSolanaBalance';
 import { useWallet } from '@solana/wallet-adapter-react';
-import solanaLogo from '../assets/solana-logo.png';
+import stellarLogo from '../assets/stellar.png';
 
 const WalletBalance = () => {
   const { balance, loading } = useSolanaBalance();
@@ -60,13 +60,13 @@ const WalletBalance = () => {
           <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-2">
-                <img src={solanaLogo} alt="SOL" className="h-5 w-5" />
-                <span className="text-gray-400">SOL Balance</span>
+                <img src={stellarLogo} alt="XLM" className="h-5 w-5" />
+                <span className="text-gray-400">XLM Balance</span>
               </div>
               <div className={`w-3 h-3 rounded-full ${connected ? 'bg-green-400' : 'bg-yellow-400'}`}></div>
             </div>
             <div className="text-3xl font-bold text-white mb-2">
-              {loading ? '...' : connected ? `${balance?.toFixed(4) ?? '0'} SOL` : 'Not connected'}
+              {loading ? '...' : connected ? `${balance?.toFixed(4) ?? '0'} XLM` : 'Not connected'}
             </div>
             <div className="text-sm text-gray-400">{connected ? 'Wallet connected' : 'Connect wallet to view'}</div>
           </div>
@@ -79,7 +79,7 @@ const WalletBalance = () => {
               </div>
               <div className="w-3 h-3 bg-green-400 rounded-full"></div>
             </div>
-            <div className="text-3xl font-bold text-white mb-2">0.00 SOL</div>
+            <div className="text-3xl font-bold text-white mb-2">0.00 XLM</div>
             <div className="text-sm text-gray-400">From your intelligence capsules</div>
           </div>
         </div>
@@ -100,7 +100,7 @@ const WalletBalance = () => {
 
               <div className="bg-gray-700 rounded-lg p-4">
                 <div className="text-sm text-gray-400 mb-2">Minimum Required Balance</div>
-                <div className="text-xl font-bold text-white">0.50 SOL</div>
+                <div className="text-xl font-bold text-white">0.50 XLM</div>
                 <div className="text-xs text-gray-500 mt-1">To maintain access to premium features</div>
               </div>
 
@@ -123,7 +123,7 @@ const WalletBalance = () => {
               
               {connected && publicKey && (
                 <a 
-                  href={`https://explorer.solana.com/address/${publicKey.toBase58()}?cluster=devnet`}
+                  href={`https://explorer.stellar.org/address/${publicKey.toBase58()}?cluster=devnet`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full bg-gray-700 hover:bg-gray-600 text-white p-4 rounded-lg transition-colors flex items-center justify-center font-semibold"
@@ -143,12 +143,12 @@ const WalletBalance = () => {
             <h3 className="text-lg font-semibold text-white">Recent Transactions</h3>
             {connected && publicKey && (
               <a 
-                href={`https://explorer.solana.com/address/${publicKey.toBase58()}?cluster=devnet`}
+                href={`https://explorer.stellar.org/address/${publicKey.toBase58()}?cluster=devnet`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-400 hover:text-blue-300 transition-colors text-sm"
               >
-                View on Solscan →
+                View on Stellar Explorer →
               </a>
             )}
           </div>
@@ -180,7 +180,7 @@ const WalletBalance = () => {
                   <div className={`font-semibold ${
                     tx.amount > 0 ? 'text-green-400' : 'text-red-400'
                   }`}>
-                    {tx.amount > 0 ? '+' : ''}{tx.amount.toFixed(3)} SOL
+                    {tx.amount > 0 ? '+' : ''}{tx.amount.toFixed(3)} XLM
                   </div>
                   <div className="text-xs text-gray-400 capitalize">{tx.status}</div>
                 </div>
