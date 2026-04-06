@@ -1,32 +1,127 @@
 # Anymind
 
-Anymind is a full-stack AI agent platform for creating, chatting with, packaging, and monetizing intelligence.
+**Anymind is a full-stack AI agent runtime for creating, monetizing, and distributing intelligence.**
 
-It combines:
+It enables developers and creators to build stateful AI agents, package their intelligence into reusable memory capsules, and monetize access through programmable micropayments.
 
-- Solana for wallet-authenticated app state, staking, and legacy SOL flows
-- Stellar for x402 USDC micropayments with sponsored fees
-- FastAPI, Supabase, and Redis for backend APIs, storage, and caching
-- React + Vite for the frontend
+Built across **AI infra + Web3 rails + developer tooling**, Anymind combines:
 
-The current app lets users:
+- **Solana** for wallet-authenticated identity, staking, and reputation
+- **Stellar x402** for USDC micropayments with sponsored fees
+- **FastAPI + Supabase + Redis** for backend orchestration and state
+- **React + Vite** for a fast, wallet-native frontend
+- **Python SDK** for programmatic agent access
 
-- create and manage custom AI agents
-- turn agent output into memory capsules
-- publish capsules into a marketplace
-- query paid capsules through Stellar x402
-- use Solana-based staking and legacy payment paths
+This is not another chat UI.
 
-## What Makes This Repo Different
+It is a runtime layer for **persistent, portable, and monetizable intelligence**.
 
-This is not just a chat UI or a smart contract repo. It is a multi-part product:
+---
 
-- `src/`: frontend application
-- `backend/`: FastAPI API, marketplace logic, wallet-aware endpoints, x402 integration
-- `contracts/`: Solana smart contracts and staking programs
-- `anymind-sdk/`: Python SDK for interacting with agents
+## Why Anymind?
 
-## Architecture
+Most AI products stop at conversations.
+
+Anymind extends intelligence beyond a single session.
+
+With Anymind, intelligence can be:
+
+- **created** as custom agents
+- **persisted** as memory capsules
+- **published** to a marketplace
+- **queried** through paid access
+- **staked** for reputation and discovery
+- **integrated** via SDKs into external applications
+
+This turns agents from temporary chats into **long-lived economic entities**.
+
+---
+
+## Core Product Flows
+
+### 1. Agent Creation
+
+Create custom AI agents with provider-backed inference.
+
+Agents support:
+
+- custom prompts
+- provider credentials
+- session memory
+- stateful backend interaction
+- wallet-aware identity
+
+---
+
+### 2. Memory Capsules
+
+Agent outputs and learned context can be packaged into **memory capsules**.
+
+Each capsule includes:
+
+- metadata
+- ownership
+- pricing
+- access permissions
+- creator reputation
+- marketplace visibility
+
+Think of capsules as **portable intelligence assets**.
+
+---
+
+### 3. Marketplace
+
+Capsules can be published and monetized through the marketplace.
+
+Users can:
+
+- browse capsules
+- discover creators
+- query paid intelligence
+- access premium agent memory
+
+---
+
+### 4. Payment Rails
+
+Anymind supports dual payment paths.
+
+#### Preferred: Stellar x402 + USDC
+
+Fast programmable micropayments with sponsored fees.
+
+Flow:
+
+Client request  
+→ `402 Payment Required`  
+→ wallet signature  
+→ `X-PAYMENT` header  
+→ facilitator settlement  
+→ response delivery
+
+#### Fallback: Solana legacy flow
+
+Used for broader wallet-native compatibility.
+
+---
+
+### 5. Staking + Reputation
+
+Creators and capsules can participate in Solana staking flows.
+
+Staking powers:
+
+- reputation scoring
+- marketplace ranking
+- creator trust
+- discovery visibility
+
+This creates an economic trust layer around intelligence.
+
+---
+
+## Tech Stack
 
 ### Frontend
 
@@ -34,7 +129,7 @@ This is not just a chat UI or a smart contract repo. It is a multi-part product:
 - TypeScript
 - Vite
 - Tailwind CSS
-- Solana wallet adapter
+- Solana Wallet Adapter
 - Stellar Wallets Kit
 
 ### Backend
@@ -46,121 +141,100 @@ This is not just a chat UI or a smart contract repo. It is a multi-part product:
 - Tavily
 - provider-based LLM integrations
 
-### Blockchain and Payments
+### Blockchain + Payments
 
-- Solana devnet wallet integration
-- Solana staking contracts via Anchor
-- Stellar x402 USDC payment flow
-- OpenZeppelin Channels facilitator for Stellar settlement
+- Solana devnet
+- Anchor smart contracts
+- Stellar x402
+- OpenZeppelin Channels facilitator
 
-## Repository Layout
+---
+
+## Repository Structure
 
 ```text
 .
-|-- src/                  Frontend app
-|   |-- components/       Shared UI
-|   |-- contexts/         Wallet and app state
-|   |-- hooks/            React hooks
-|   |-- pages/            Main product screens
-|   `-- utils/            Payment and storage helpers
-|-- backend/              FastAPI backend
-|   |-- app/
-|   |   |-- api/          REST endpoints
-|   |   |-- core/         Settings and auth helpers
-|   |   |-- db/           Database setup
-|   |   |-- models/       Pydantic schemas
-|   |   `-- services/     Marketplace, wallet, x402, memory logic
-|   `-- supabase/         SQL migrations
-|-- contracts/            Solana contract projects
-|-- anymind-sdk/          Python SDK
-|-- wallet.md             Local note pointing to Stellar Wallets Kit docs
-`-- vercel.json           Frontend deployment config
+├── src/                     Frontend application
+│   ├── components/          Shared UI components
+│   ├── contexts/            Wallet + global state
+│   ├── hooks/               Custom React hooks
+│   ├── pages/               Main product screens
+│   └── utils/               Payments + helpers
+│
+├── backend/                 FastAPI backend
+│   ├── app/
+│   │   ├── api/             REST endpoints
+│   │   ├── core/            Settings + auth
+│   │   ├── db/              Database setup
+│   │   ├── models/          Pydantic schemas
+│   │   └── services/        Core business logic
+│   └── supabase/            SQL migrations
+│
+├── contracts/               Solana smart contracts
+├── anymind-sdk/             Python SDK
+├── wallet.md
+└── vercel.json
 ```
 
-## Core Flows
+---
 
-### 1. Agent Creation
-
-Users create custom AI agents, store provider credentials, and chat with those agents through the backend.
-
-### 2. Memory Capsules
-
-Agent knowledge can be packaged into capsules with metadata, pricing, and staking-backed reputation.
-
-### 3. Marketplace
-
-Capsules can be discovered, browsed, and queried from the marketplace UI.
-
-### 4. Payments
-
-Paid capsule queries use two paths:
-
-- preferred: Stellar x402 with USDC
-- fallback: legacy Solana payment flow
-
-### 5. Staking
-
-Capsules and creators can use Solana staking mechanics for reputation and marketplace visibility.
-
-## Local Setup
+## Local Development Setup
 
 ### Prerequisites
 
 - Node.js 18+
 - npm
 - Python 3.9+
-- a Supabase project
-- an Upstash Redis or Vercel KV instance
-- at least one LLM provider key for meaningful agent responses
+- Supabase project
+- Redis / Upstash / Vercel KV
+- LLM provider API key
 
-Optional but useful:
+Optional:
 
-- a Solana wallet such as Phantom
-- a Stellar wallet compatible with Stellar Wallets Kit for x402 testing
+- Phantom wallet
+- Stellar-compatible wallet
 
-### 1. Install frontend dependencies
+---
+
+## 1. Install Frontend
 
 ```bash
 npm install
 ```
 
-If you are using PowerShell on Windows and `npm` is blocked by execution policy, use:
+PowerShell:
 
 ```powershell
 npm.cmd install
 ```
 
-### 2. Install backend dependencies
+---
+
+## 2. Install Backend
 
 ```bash
 cd backend
 pip install -r requirements.txt
 ```
 
-### 3. Configure environment variables
+---
 
-The frontend only hard-requires:
+## 3. Configure Environment Variables
+
+### Frontend
 
 ```env
 VITE_API_BASE_URL=http://localhost:8000
 ```
 
-The backend reads its settings from `backend/.env` and expects values such as:
+### Backend
 
 ```env
 DEBUG=True
 HOST=0.0.0.0
 PORT=8000
 
-VITE_SUPABASE_URL=...
-VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY=...
 SUPABASE_SERVICE_KEY=...
-
-KV_REST_API_URL=...
-KV_REST_API_TOKEN=...
-UPSTASH_REDIS_REST_URL=...
-UPSTASH_REDIS_REST_TOKEN=...
-
 OPENROUTER_API_KEY=...
 MEM0_API_KEY=...
 TAVILY_API_KEY=...
@@ -170,55 +244,66 @@ SOLANA_NETWORK=devnet
 
 STELLAR_PAY_TO_ADDRESS=...
 STELLAR_NETWORK=stellar:testnet
-STELLAR_USDC_ASSET=CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75
 FACILITATOR_URL=https://channels.openzeppelin.com/x402/testnet
-OZ_RELAYER_API_KEY=...
 ```
 
-Use these repo files as references:
+Use:
 
 - `env.example`
 - `backend/env.example`
 
-### 4. Start the backend
+as reference templates.
 
-From the `backend/` directory:
+---
+
+## 4. Run Backend
 
 ```bash
+cd backend
 python main.py
 ```
 
-The API will start on `http://localhost:8000`.
+Backend runs at:
 
-### 5. Start the frontend
+```text
+http://localhost:8000
+```
 
-From the repo root:
+---
+
+## 5. Run Frontend
 
 ```bash
 npm run dev
 ```
 
-The app will start on `http://localhost:5173`.
+Frontend runs at:
+
+```text
+http://localhost:5173
+```
+
+---
 
 ## Frontend Commands
 
 | Command | Description |
 |---|---|
-| `npm run dev` | Start the Vite dev server |
-| `npm run build` | Create a production build |
-| `npm run preview` | Preview the production build locally |
-| `npm run lint` | Run ESLint |
-| `npm run typecheck` | Run TypeScript checks |
+| `npm run dev` | Start dev server |
+| `npm run build` | Production build |
+| `npm run preview` | Preview build |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | TypeScript checks |
+
+---
 
 ## Backend API
 
-Once the backend is running:
+- `/docs`
+- `/redoc`
+- `/health`
 
-- OpenAPI docs: `http://localhost:8000/docs`
-- ReDoc: `http://localhost:8000/redoc`
-- Health check: `http://localhost:8000/health`
-
-Main route groups:
+### Route Groups
 
 - `/api/v1/agents`
 - `/api/v1/capsules`
@@ -227,47 +312,13 @@ Main route groups:
 - `/api/v1/auth`
 - `/api/v1/preferences`
 
-## Wallet Model
+---
 
-The app currently uses two wallet layers:
+## Smart Contracts
 
-- Solana wallet adapter for app identity, staking, balances, and legacy flows
-- Stellar Wallets Kit for x402-connected Stellar wallets
+Programs live inside `contracts/`.
 
-In practice:
-
-- users can connect a Solana wallet to access most app flows
-- users can connect a Stellar wallet when paying for capsule queries via x402
-- paid capsule queries can use Stellar first and fall back to Solana where supported
-
-## Stellar x402 Notes
-
-The x402 integration is already wired into the client and backend.
-
-A paid query flow looks like this:
-
-1. The client sends a capsule query.
-2. The backend responds with `402 Payment Required` when x402 is active.
-3. The client signs a Stellar payment payload through Stellar Wallets Kit.
-4. The request is retried with an `X-PAYMENT` header.
-5. The facilitator settles the payment and the query completes.
-
-To use this flow locally, make sure:
-
-- `STELLAR_PAY_TO_ADDRESS` is set
-- `FACILITATOR_URL` is valid
-- the buyer has a compatible Stellar wallet connected
-
-## Solana Contracts
-
-Solana programs live under `contracts/`.
-
-Key directories:
-
-- `contracts/all-contracts/`
-- `contracts/solmind-staking/`
-
-If you are working on the staking program:
+Build + deploy:
 
 ```bash
 cd contracts/solmind-staking
@@ -275,48 +326,59 @@ anchor build
 anchor deploy
 ```
 
+---
+
 ## Python SDK
 
-The repo also includes a Python SDK in `anymind-sdk/`.
+The `anymind-sdk/` package enables agent access from:
 
-That package is useful if you want to interact with Anymind agents outside the web app, for example from scripts or backend services.
+- scripts
+- external backends
+- automations
+- third-party products
+
+This makes Anymind portable beyond the web app.
+
+---
 
 ## Deployment
 
 ### Frontend
 
-The frontend is configured for Vercel with `vercel.json`.
+- Vercel
 
 ### Backend
 
-The backend is configured for Render using:
+- Render
+- Dockerized deployment support
+
+Files:
 
 - `backend/render.yaml`
 - `backend/Dockerfile`
 
-## Known Setup Gotchas
+---
 
-- The frontend will fail fast if `VITE_API_BASE_URL` is missing.
-- The backend expects Supabase and Redis-style credentials for full functionality.
-- Some advanced flows degrade gracefully if optional services like Mem0 or Redis are unavailable.
-- PowerShell users on Windows may need `npm.cmd` instead of `npm`.
+## Known Gotchas
 
-## Contributing
+- frontend requires `VITE_API_BASE_URL`
+- backend expects Supabase + Redis for full functionality
+- advanced memory flows degrade gracefully without optional services
+- PowerShell may require `npm.cmd`
 
-Before opening a PR, run:
+---
 
-```bash
-npm run lint
-npm run typecheck
-npm run build
-```
+## Vision
 
-If you changed backend logic, also validate:
+Anymind is building toward an **agentic internet** where intelligence is no longer session-bound.
 
-- local API startup
-- `/health`
-- the relevant wallet or payment flow
+Instead of isolated prompts, intelligence becomes:
 
-## License
+- persistent
+- composable
+- monetizable
+- portable
+- economically native
 
-Proprietary. This repository is part of the Anymind project.
+The long-term goal is to make AI agents function like programmable digital entities.
+
