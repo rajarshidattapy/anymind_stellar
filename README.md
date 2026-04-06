@@ -1,4 +1,4 @@
-# Anymind
+# Anymind 🧠
 
 **Anymind is a full-stack AI agent runtime for creating, monetizing, and distributing intelligence.**
 
