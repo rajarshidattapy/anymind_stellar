@@ -44,6 +44,10 @@ export interface StellarPaymentResult {
   error?: string;
 }
 
+function normalizeExplorerNetwork(network: string): "public" | "testnet" {
+  return /pubnet|public|mainnet/i.test(network) ? "public" : "testnet";
+}
+
 // ── Freighter wallet helpers ────────────────────────────────
 
 declare global {
@@ -250,11 +254,16 @@ export async function payAndRetry(
  */
 export function getStellarExplorerUrl(
   txHash: string,
-  network: string = "stellar:testnet"
+  network: string = import.meta.env.VITE_STELLAR_NETWORK ?? "stellar:testnet"
 ): string {
-  const base =
-    network === "stellar:pubnet"
-      ? "https://stellar.expert/explorer/public/tx"
-      : "https://stellar.expert/explorer/testnet/tx";
-  return `${base}/${txHash}`;
+  const explorerNetwork = normalizeExplorerNetwork(network);
+  return `https://stellar.expert/explorer/${explorerNetwork}/tx/${txHash}`;
+}
+
+export function getStellarAccountExplorerUrl(
+  accountId: string,
+  network: string = import.meta.env.VITE_STELLAR_NETWORK ?? "stellar:testnet"
+): string {
+  const explorerNetwork = normalizeExplorerNetwork(network);
+  return `https://stellar.expert/explorer/${explorerNetwork}/account/${accountId}`;
 }

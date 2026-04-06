@@ -7,7 +7,7 @@ import WalletView from './WalletView';
 import Settings from './Settings';
 import CapsuleDetail from './CapsuleDetail';
 import { useApiClient } from '../lib/api';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useWallet } from '../contexts/WalletContextProvider';
 
 interface LLMConfig {
   id: string;
@@ -91,7 +91,7 @@ const MainApp = () => {
     const timeoutId = setTimeout(savePreferences, 500);
     return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab, activeSubTab, connected, publicKey?.toBase58()]); // api is stable, doesn't need to be in deps
+  }, [activeTab, activeSubTab, connected, publicKey]); // api is stable, doesn't need to be in deps
 
   // Load custom agents from backend when wallet is connected
   useEffect(() => {
@@ -156,7 +156,7 @@ const MainApp = () => {
 
     loadCustomAgents();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connected, publicKey?.toBase58()]); // Reload when wallet connects/disconnects (api is stable)
+  }, [connected, publicKey]); // Reload when wallet connects/disconnects (api is stable)
 
   const handleAddLLM = (llm: LLMConfig) => {
     setCustomLLMs(prev => {

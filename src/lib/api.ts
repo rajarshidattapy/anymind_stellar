@@ -1,4 +1,4 @@
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useWallet } from '../contexts/WalletContextProvider';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 if (!API_BASE_URL) {
@@ -385,7 +385,7 @@ export function useApiClient() {
   const { publicKey } = useWallet();
   
   const getWalletAddress = () => {
-    return publicKey?.toBase58() || null;
+    return publicKey || null;
   };
 
   return new ApiClient(getWalletAddress);

@@ -245,7 +245,7 @@ const MemoryCapsuleView = () => {
                   <div className="space-y-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-400 mb-2">
-                        Price per Query (SOL)
+                        Price per Query (USDC on Stellar)
                       </label>
                       <input
                         type="number"

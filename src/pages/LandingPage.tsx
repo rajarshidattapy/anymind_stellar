@@ -1,7 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { useStellarWallet } from '../contexts/StellarWalletContext';
 import {
   MessageSquare,
   Package,
@@ -13,55 +11,41 @@ import {
   Terminal,
   Github,
   ExternalLink,
-} from "lucide-react";
-import stellarLogo from "../assets/stellar.png";
-import appLogo from "../assets/stellarmind.png";
-import { useSolanaBalance } from "../hooks/useSolanaBalance";
+} from 'lucide-react';
+import stellarLogo from '../assets/stellar.png';
+import appLogo from '../assets/stellarmind.png';
+import { useStellarBalance } from '../hooks/useStellarBalance';
+import { useWallet } from '../contexts/WalletContextProvider';
 
 export default function LandingPage() {
-  const { connected, publicKey, disconnect } = useWallet();
-  const {
-    address: stellarAddress,
-    connected: stellarConnected,
-    connecting: stellarConnecting,
-    connect: connectStellarWallet,
-    disconnect: disconnectStellarWallet,
-  } = useStellarWallet();
-  const { balance, loading } = useSolanaBalance();
+  const { publicKey, connected, connecting, connect, disconnect } = useWallet();
+  const { balance, loading } = useStellarBalance(publicKey);
   const [showDisconnect, setShowDisconnect] = useState(false);
-  const [showStellarDisconnect, setShowStellarDisconnect] = useState(false);
   const disconnectRef = useRef<HTMLDivElement>(null);
-  const stellarDisconnectRef = useRef<HTMLDivElement>(null);
 
   const shortenAddress = (address: string) => {
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (disconnectRef.current && !disconnectRef.current.contains(event.target as Node)) {
         setShowDisconnect(false);
       }
-      if (stellarDisconnectRef.current && !stellarDisconnectRef.current.contains(event.target as Node)) {
-        setShowStellarDisconnect(false);
-      }
     };
 
-    if (showDisconnect || showStellarDisconnect) {
+    if (showDisconnect) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showDisconnect, showStellarDisconnect]);
+  }, [showDisconnect]);
 
-  const handleStellarConnect = async () => {
-    await connectStellarWallet();
+  const handleConnect = async () => {
+    await connect();
   };
-
-  const hasWalletSession = stellarConnected || connected;
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
@@ -83,29 +67,7 @@ export default function LandingPage() {
             </Link>
           </nav>
           <div className="flex items-center gap-4">
-            {stellarConnected && stellarAddress ? (
-              <div className="relative" ref={stellarDisconnectRef}>
-                <button
-                  onClick={() => setShowStellarDisconnect(!showStellarDisconnect)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                >
-                  {shortenAddress(stellarAddress)}
-                </button>
-                {showStellarDisconnect && (
-                  <div className="absolute top-full right-0 mt-1 z-50">
-                    <button
-                      onClick={() => {
-                        void disconnectStellarWallet();
-                        setShowStellarDisconnect(false);
-                      }}
-                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap w-full"
-                    >
-                      Disconnect Stellar
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : connected && publicKey ? (
+            {connected && publicKey ? (
               <div className="flex items-center gap-3">
                 <div className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 flex items-center gap-2">
                   <img src={stellarLogo} alt="XLM" className="w-4 h-4" />
@@ -116,20 +78,20 @@ export default function LandingPage() {
                 <div className="relative" ref={disconnectRef}>
                   <button
                     onClick={() => setShowDisconnect(!showDisconnect)}
-                    className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                   >
-                    {shortenAddress(publicKey.toBase58())}
+                    {shortenAddress(publicKey)}
                   </button>
                   {showDisconnect && (
                     <div className="absolute top-full right-0 mt-1 z-50">
                       <button
                         onClick={() => {
-                          disconnect();
+                          void disconnect();
                           setShowDisconnect(false);
                         }}
                         className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap w-full"
                       >
-                        Disconnect
+                        Disconnect Wallet
                       </button>
                     </div>
                   )}
@@ -137,11 +99,11 @@ export default function LandingPage() {
               </div>
             ) : (
               <button
-                onClick={() => void handleStellarConnect()}
-                disabled={stellarConnecting}
+                onClick={() => void handleConnect()}
+                disabled={connecting}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {stellarConnecting ? 'Opening Wallets...' : 'Select Wallet'}
+                {connecting ? 'Opening Wallets...' : 'Select Wallet'}
               </button>
             )}
           </div>
@@ -159,10 +121,10 @@ export default function LandingPage() {
           </h1>
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
             Anymind is an AI intelligence marketplace powered by Stellar. Chat with agents, package long-term intelligence
-            into capsules, and monetize them with x402 micropayments in USDC — zero gas fees for buyers.
+            into capsules, and monetize them with x402 micropayments in USDC with zero gas fees for buyers.
           </p>
           <div className="flex flex-row items-center justify-center gap-6 mt-8">
-            {hasWalletSession ? (
+            {connected ? (
               <Link
                 to="/app"
                 className="bg-white text-blue-600 font-medium px-8 py-3 rounded-md shadow hover:bg-blue-50 transition-colors border border-white focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -171,11 +133,11 @@ export default function LandingPage() {
               </Link>
             ) : (
               <button
-                onClick={() => void handleStellarConnect()}
-                disabled={stellarConnecting}
+                onClick={() => void handleConnect()}
+                disabled={connecting}
                 className="bg-white text-blue-600 font-medium px-8 py-3 rounded-md shadow hover:bg-blue-50 transition-colors border border-white focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {stellarConnecting ? 'Opening Wallets...' : 'Select Wallet'}
+                {connecting ? 'Opening Wallets...' : 'Select Wallet'}
               </button>
             )}
             <Link
@@ -220,7 +182,7 @@ export default function LandingPage() {
                   </div>
                   <div className="flex gap-4 pl-4">
                     <span className="text-gray-500">5</span>
-                    &nbsp;&nbsp;&nbsp;&nbsp;wallet_address=<span className="text-green-400">"YourStellarWalletAddress"</span>,
+                    &nbsp;&nbsp;&nbsp;&nbsp;wallet_address=<span className="text-green-400">"YourStellarAccountID"</span>,
                   </div>
                   <div className="flex gap-4 pl-4">
                     <span className="text-gray-500">6</span>
@@ -256,8 +218,8 @@ export default function LandingPage() {
                       <div className="text-[10px] text-gray-400 uppercase font-semibold">Queries Served</div>
                     </div>
                     <div className="space-y-1">
-                      <div className="text-2xl font-bold tracking-tight text-blue-400">24.1 SOL</div>
-                      <div className="text-[10px] text-gray-400 uppercase font-semibold">Total Revenue</div>
+                      <div className="text-2xl font-bold tracking-tight text-blue-400">24.1 XLM</div>
+                      <div className="text-[10px] text-gray-400 uppercase font-semibold">Total Reputation Stake</div>
                     </div>
                   </div>
                   <button className="w-full text-xs h-8 bg-gray-900 border border-gray-800 hover:bg-white/5 rounded text-white transition-colors">
@@ -272,10 +234,10 @@ export default function LandingPage() {
         <section className="container mx-auto px-6 mb-32">
           <div className="grid grid-cols-2 md:grid-cols-4 border border-gray-800 rounded-xl overflow-hidden divide-x divide-gray-800">
             {[
-              { label: "Saved on Compute", val: "40%", sub: "vs traditional RAG" },
-              { label: "Time to Market", val: "98%", sub: "faster deployment" },
-              { label: "Revenue Generated", val: "2.4M", sub: "SOL to creators" },
-              { label: "Active Capsules", val: "12k+", sub: "intelligence assets" },
+              { label: 'Saved on Compute', val: '40%', sub: 'vs traditional RAG' },
+              { label: 'Time to Market', val: '98%', sub: 'faster deployment' },
+              { label: 'Revenue Generated', val: '2.4M', sub: 'XLM and USDC to creators' },
+              { label: 'Active Capsules', val: '12k+', sub: 'intelligence assets' },
             ].map((stat) => (
               <div key={stat.label} className="p-8 hover:bg-white/5 transition-colors">
                 <div className="text-3xl font-bold tracking-tighter mb-1">{stat.val}</div>
@@ -315,10 +277,10 @@ export default function LandingPage() {
                   </div>
                   <div className="bg-gray-700/50 p-8 flex items-center justify-center">
                     <div className="space-y-3 w-full">
-                      {[1, 2, 3].map((i) => (
+                      {[1, 2, 3].map((index) => (
                         <div
-                          key={i}
-                          className={`p-3 rounded-lg border border-gray-800 bg-gray-900 shadow-sm ${i === 2 ? "translate-x-4 border-blue-600/20 bg-blue-600/5" : ""}`}
+                          key={index}
+                          className={`p-3 rounded-lg border border-gray-800 bg-gray-900 shadow-sm ${index === 2 ? 'translate-x-4 border-blue-600/20 bg-blue-600/5' : ''}`}
                         >
                           <div className="flex gap-3">
                             <div className="w-6 h-6 rounded-full bg-gray-700 shrink-0" />
@@ -352,7 +314,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="text-2xl font-bold mb-4">3. Stake</h3>
                 <p className="text-base text-gray-400 mt-4">
-                  Stake SOL behind your capsule to signal reputation and boost visibility in the marketplace.
+                  Stake XLM behind your capsule to signal reputation and boost visibility in the marketplace.
                 </p>
               </div>
             </div>
@@ -366,12 +328,12 @@ export default function LandingPage() {
                     </div>
                     <h3 className="text-2xl font-bold mb-4">4. Monetize</h3>
                     <p className="text-gray-400 leading-relaxed">
-                      Each query triggers a Stellar x402 USDC micropayment — zero gas fees for buyers,
-                      sub-5s settlement, fully permissionless. Solana staking for reputation.
+                      Each query triggers a Stellar x402 USDC micropayment with zero gas fees for buyers,
+                      sub-5s settlement, and reputation-aware capsule discovery powered by Stellar-backed stake.
                     </p>
                   </div>
                   <div className="bg-blue-600 p-8 flex flex-col items-center justify-center text-white text-center">
-                    <div className="text-4xl font-bold tracking-tighter mb-2">0.0001s</div>
+                    <div className="text-4xl font-bold tracking-tighter mb-2">&lt;5s</div>
                     <div className="text-sm font-semibold opacity-80 uppercase tracking-widest">Settlement Time</div>
                     <div className="mt-8 w-16 h-16 rounded-full border-4 border-white/20 flex items-center justify-center animate-pulse">
                       <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
@@ -404,32 +366,32 @@ export default function LandingPage() {
             <div className="divide-y divide-gray-800">
               {[
                 {
-                  name: "DeFi Alpha Hunter",
-                  creator: "0xAlpha",
-                  queries: "12.4k",
-                  staked: "450 XLM",
-                  price: "0.005",
-                  category: "Trading",
+                  name: 'DeFi Alpha Hunter',
+                  creator: 'AlphaDAO',
+                  queries: '12.4k',
+                  staked: '450 XLM',
+                  price: '$0.005',
+                  category: 'Trading',
                 },
                 {
-                  name: "Legal Contract Analyzer",
-                  creator: "LegalMind",
-                  queries: "8.2k",
-                  staked: "320 XLM",
-                  price: "0.01",
-                  category: "Legal",
+                  name: 'Legal Contract Analyzer',
+                  creator: 'LegalMind',
+                  queries: '8.2k',
+                  staked: '320 XLM',
+                  price: '$0.01',
+                  category: 'Legal',
                 },
                 {
-                  name: "Code Review Assistant",
-                  creator: "DevDAO",
-                  queries: "24.1k",
-                  staked: "890 XLM",
-                  price: "0.003",
-                  category: "Development",
+                  name: 'Code Review Assistant',
+                  creator: 'DevDAO',
+                  queries: '24.1k',
+                  staked: '890 XLM',
+                  price: '$0.003',
+                  category: 'Development',
                 },
-              ].map((capsule, i) => (
+              ].map((capsule, index) => (
                 <div
-                  key={i}
+                  key={index}
                   className="p-4 flex items-center justify-between hover:bg-white/5 transition-colors cursor-pointer"
                 >
                   <div className="flex items-center gap-4">
@@ -451,8 +413,8 @@ export default function LandingPage() {
                       <div className="text-xs text-gray-400">Staked</div>
                     </div>
                     <div className="text-center">
-                      <div className="font-semibold">{capsule.price} SOL</div>
-                      <div className="text-xs text-gray-400">per query</div>
+                      <div className="font-semibold">{capsule.price}</div>
+                      <div className="text-xs text-gray-400">USDC per query</div>
                     </div>
                     <span className="px-2 py-1 rounded text-xs bg-gray-700">{capsule.category}</span>
                   </div>
@@ -472,11 +434,11 @@ export default function LandingPage() {
                 </div>
                 <h2 className="text-3xl font-bold tracking-tight mb-4">Build on Anymind</h2>
                 <p className="text-gray-400 mb-8">
-                  Our TypeScript SDK makes it easy to create, query, and monetize intelligence capsules. Full Solana
-                  integration out of the box.
+                  Our TypeScript SDK makes it easy to create, query, and monetize intelligence capsules with Stellar-native
+                  wallet identity and x402 payments.
                 </p>
                 <div className="flex gap-4">
-                  <Link 
+                  <Link
                     to="/developers"
                     className="bg-white text-gray-900 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors"
                   >
@@ -495,13 +457,13 @@ export default function LandingPage() {
                 </div>
                 <div className="mt-4 text-gray-400">// Query a capsule</div>
                 <div>
-                  <span className="text-blue-400">const</span> response ={" "}
-                  <span className="text-blue-400">await</span> capsule.query({"{"}
+                  <span className="text-blue-400">const</span> response ={' '}
+                  <span className="text-blue-400">await</span> capsule.query({'{'}
                 </div>
                 <div className="pl-4">
                   prompt: <span className="text-green-400">"Analyze this contract..."</span>
                 </div>
-                <div>{"}"});</div>
+                <div>{'}'});</div>
               </div>
             </div>
           </div>
@@ -529,7 +491,7 @@ export default function LandingPage() {
                 Twitter
               </a>
             </div>
-            <div className="text-xs text-gray-500">© 2024 Anymind Protocol. All rights reserved.</div>
+            <div className="text-xs text-gray-500">Copyright 2024 Anymind Protocol. All rights reserved.</div>
           </div>
         </div>
       </footer>

@@ -8,7 +8,7 @@ class Agent:
 
     - agent_id: persistent agent identity
     - chat_id: strict capsule scope
-    - wallet_address: Solana wallet address for authentication
+    - wallet_address: Stellar account ID for authentication
     """
 
     def __init__(

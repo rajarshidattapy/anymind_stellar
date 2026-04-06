@@ -126,7 +126,7 @@ class MarketplaceFilters(BaseModel):
 class WalletBalance(BaseModel):
     wallet_address: str
     balance: float
-    currency: str = "SOL"
+    currency: str = "XLM"
 
 
 class Earnings(BaseModel):

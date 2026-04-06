@@ -1,8 +1,6 @@
 import { useState } from 'react';
-import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { useStellarWallet } from '../contexts/StellarWalletContext';
+import { useWallet } from '../contexts/WalletContextProvider';
 import { useApiClient } from '../lib/api';
-import { sendPayment, PaymentResult } from '../utils/solanaPayment';
 import {
   isX402Challenge,
   payAndRetry,
@@ -15,15 +13,12 @@ export interface QueryResult {
   response: string;
   capsule_id: string;
   price_paid: number;
-  txSignature?: string;
-  payment_method?: 'solana' | 'stellar_x402';
+  payment_method?: 'stellar_x402';
   stellar_tx_hash?: string;
 }
 
 export function useCapsuleQuery() {
-  const { connection } = useConnection();
-  const { publicKey, signTransaction } = useWallet();
-  const { address: stellarAddress, connected: stellarConnected } = useStellarWallet();
+  const { publicKey } = useWallet();
   const apiClient = useApiClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,24 +28,16 @@ export function useCapsuleQuery() {
     prompt: string;
   } | null>(null);
 
-  /**
-   * Query a capsule with automatic payment handling.
-   *
-   * Flow:
-   *   1. Send query to backend
-   *   2. If 402 → x402 Stellar payment flow (Freighter)
-   *   3. If Stellar not available → fall back to Solana payment
-   */
   const queryWithPayment = async (
     capsuleId: string,
     prompt: string,
-    creatorWallet: string,
-    pricePerQuery: number
+    _creatorWallet: string,
+    _pricePerQuery: number
   ): Promise<QueryResult | null> => {
-    const activeWalletAddress = publicKey?.toBase58() || stellarAddress || '';
+    const activeWalletAddress = publicKey || '';
 
     if (!activeWalletAddress) {
-      setError('Wallet not connected. Please connect a Solana or Stellar wallet first.');
+      setError('Wallet not connected. Please connect a Stellar wallet first.');
       return null;
     }
 
@@ -64,14 +51,12 @@ export function useCapsuleQuery() {
     setPendingChallenge(null);
 
     try {
-      // Step 1: Try the query — may return 402 if x402 is configured
       const rawResponse = await apiClient.queryCapsuleRaw(
         capsuleId,
         { prompt },
         { 'X-Wallet-Address': activeWalletAddress }
       );
 
-      // Step 2: Handle 402 → x402 Stellar payment
       if (rawResponse.status === 402) {
         const body = await rawResponse.json();
 
@@ -82,19 +67,12 @@ export function useCapsuleQuery() {
             prompt,
           });
 
-          if (!stellarConnected) {
-            return await queryWithSolanaPayment(
-              capsuleId, prompt, creatorWallet, pricePerQuery
-            );
-          }
-
-          // Execute x402 Stellar payment
-          const result = await payWithStellar(capsuleId, prompt, body);
-          return result;
+          return await payWithStellar(capsuleId, prompt, body);
         }
+
+        throw new Error('This capsule requires a Stellar x402 payment before it can be queried.');
       }
 
-      // Step 3: Non-402 response — either success or error
       if (!rawResponse.ok) {
         const errorData = await rawResponse.json().catch(() => ({}));
         throw new Error(errorData.detail || `Query failed (${rawResponse.status})`);
@@ -117,16 +95,13 @@ export function useCapsuleQuery() {
     }
   };
 
-  /**
-   * Execute x402 Stellar payment flow via the connected Stellar wallet.
-   */
   const payWithStellar = async (
     capsuleId: string,
     prompt: string,
     challenge: X402Challenge
   ): Promise<QueryResult | null> => {
     try {
-      const walletAddress = publicKey?.toBase58() || stellarAddress || '';
+      const walletAddress = publicKey || '';
       const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
       const url = `${apiBaseUrl}/api/v1/capsules/${encodeURIComponent(capsuleId)}/query`;
 
@@ -152,55 +127,6 @@ export function useCapsuleQuery() {
       const message = err instanceof Error ? err.message : 'Stellar payment failed';
       setError(message);
       return null;
-    }
-  };
-
-  /**
-   * Legacy Solana payment flow (fallback).
-   */
-  const queryWithSolanaPayment = async (
-    capsuleId: string,
-    prompt: string,
-    creatorWallet: string,
-    pricePerQuery: number
-  ): Promise<QueryResult | null> => {
-    if (!publicKey || !signTransaction) {
-      setError('Solana wallet not connected');
-      return null;
-    }
-
-    try {
-      let paymentSignature: string | undefined;
-
-      if (pricePerQuery > 0) {
-        const paymentResult: PaymentResult = await sendPayment(
-          connection,
-          publicKey,
-          creatorWallet,
-          pricePerQuery,
-          signTransaction
-        );
-
-        if (!paymentResult.success) {
-          throw new Error(paymentResult.error || 'Payment failed');
-        }
-
-        paymentSignature = paymentResult.signature;
-      }
-
-      const response = await apiClient.queryCapsule(capsuleId, {
-        prompt,
-        payment_signature: paymentSignature,
-        amount_paid: pricePerQuery,
-      });
-
-      return {
-        ...(response as any),
-        txSignature: paymentSignature,
-        payment_method: 'solana',
-      };
-    } catch (err) {
-      throw err; // Re-throw for caller to handle
     }
   };
 

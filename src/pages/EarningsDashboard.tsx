@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { TrendingUp, Users, Calendar, ArrowUpRight, ExternalLink } from 'lucide-react';
-import { useSolanaBalance } from '../hooks/useSolanaBalance';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useStellarBalance } from '../hooks/useStellarBalance';
+import { useWallet } from '../contexts/WalletContextProvider';
 import stellarLogo from '../assets/stellar.png';
+import { getStellarAccountExplorerUrl } from '../utils/stellarPayment';
 
 const EarningsDashboard = () => {
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
-  const { balance, loading } = useSolanaBalance();
   const { connected, publicKey } = useWallet();
+  const { balance, loading } = useStellarBalance(publicKey);
 
   const shortenAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
@@ -17,7 +18,7 @@ const EarningsDashboard = () => {
     total: 0,
     thisMonth: 0,
     growth: 0,
-    queryCount: 0
+    queryCount: 0,
   };
 
   const capsuleEarnings = [
@@ -28,16 +29,16 @@ const EarningsDashboard = () => {
       queries: 487,
       revenue: 8.45,
       avgPrice: 0.02,
-      trend: 15.2
+      trend: 15.2,
     },
     {
       id: '2',
       name: 'Crypto Trading Intelligence',
       category: 'Finance',
       queries: 312,
-      revenue: 6.80,
+      revenue: 6.8,
       avgPrice: 0.05,
-      trend: -2.1
+      trend: -2.1,
     },
     {
       id: '3',
@@ -46,15 +47,13 @@ const EarningsDashboard = () => {
       queries: 198,
       revenue: 3.67,
       avgPrice: 0.03,
-      trend: 8.7
-    }
+      trend: 8.7,
+    },
   ];
 
-
-  // Mock chart data
-  const chartData = Array.from({ length: 30 }, (_, i) => ({
-    day: i + 1,
-    earnings: Math.random() * 0.5 + 0.1
+  const chartData = Array.from({ length: 30 }, (_, index) => ({
+    day: index + 1,
+    earnings: Math.random() * 0.5 + 0.1,
   }));
 
   return (
@@ -64,10 +63,10 @@ const EarningsDashboard = () => {
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">Earnings Dashboard</h1>
             <p className="text-gray-400">
-              {connected && publicKey ? shortenAddress(publicKey.toBase58()) : 'Connect wallet to view earnings'}
+              {connected && publicKey ? shortenAddress(publicKey) : 'Connect your Stellar wallet to view earnings'}
             </p>
           </div>
-          
+
           <div className="flex space-x-3">
             {(['7d', '30d', '90d', '1y'] as const).map((period) => (
               <button
@@ -85,7 +84,6 @@ const EarningsDashboard = () => {
           </div>
         </div>
 
-        {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
             <div className="flex items-center space-x-2 mb-3">
@@ -126,11 +124,10 @@ const EarningsDashboard = () => {
           </div>
         </div>
 
-        {/* View on Explorer */}
         {connected && publicKey && (
           <div className="mb-8">
-            <a 
-              href={`https://explorer.stellar.org/address/${publicKey.toBase58()}?cluster=devnet`}
+            <a
+              href={getStellarAccountExplorerUrl(publicKey)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors"
@@ -141,9 +138,7 @@ const EarningsDashboard = () => {
           </div>
         )}
 
-        {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Earnings Chart */}
           <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Daily Earnings</h3>
             <div className="h-64 flex items-end space-x-1 mb-4">
@@ -159,7 +154,6 @@ const EarningsDashboard = () => {
             <div className="text-center text-gray-400 text-sm">Last 30 days</div>
           </div>
 
-          {/* Top Performing Capsules */}
           <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Performance by Capsule</h3>
             <div className="space-y-4">
@@ -188,7 +182,6 @@ const EarningsDashboard = () => {
           </div>
         </div>
 
-        {/* Capsule Details */}
         <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
           <h3 className="text-lg font-semibold text-white mb-4">Capsule Details</h3>
           <div className="overflow-x-auto">

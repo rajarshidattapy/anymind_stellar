@@ -1,15 +1,17 @@
 import { TrendingUp, Plus, ArrowUpRight, ArrowDownLeft, ExternalLink } from 'lucide-react';
-import { useSolanaBalance } from '../hooks/useSolanaBalance';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useStellarBalance } from '../hooks/useStellarBalance';
+import { useWallet } from '../contexts/WalletContextProvider';
 import stellarLogo from '../assets/stellar.png';
+import { getStellarAccountExplorerUrl } from '../utils/stellarPayment';
 
 const WalletBalance = () => {
-  const { balance, loading } = useSolanaBalance();
   const { connected, publicKey } = useWallet();
-  
+  const { balance, loading } = useStellarBalance(publicKey);
+
   const shortenAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
+
   const transactions = [
     {
       id: '1',
@@ -17,23 +19,23 @@ const WalletBalance = () => {
       description: 'Query - DeFi Yield Farming Expert',
       amount: -0.05,
       timestamp: new Date(Date.now() - 1800000),
-      status: 'completed'
+      status: 'completed',
     },
     {
       id: '2',
       type: 'earning',
       description: 'Earnings - Pokemon Strategy Master',
-      amount: +0.08,
+      amount: 0.08,
       timestamp: new Date(Date.now() - 3600000),
-      status: 'completed'
+      status: 'completed',
     },
     {
       id: '3',
       type: 'deposit',
       description: 'Wallet Top-up',
-      amount: +10.0,
+      amount: 10.0,
       timestamp: new Date(Date.now() - 86400000),
-      status: 'completed'
+      status: 'completed',
     },
     {
       id: '4',
@@ -41,8 +43,8 @@ const WalletBalance = () => {
       description: 'Staked behind Crypto Trading Intelligence',
       amount: -5.0,
       timestamp: new Date(Date.now() - 172800000),
-      status: 'completed'
-    }
+      status: 'completed',
+    },
   ];
 
   return (
@@ -51,11 +53,10 @@ const WalletBalance = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Wallet & Balance</h1>
           <p className="text-gray-400">
-            {connected && publicKey ? shortenAddress(publicKey.toBase58()) : 'Connect your Solana wallet to view balance'}
+            {connected && publicKey ? shortenAddress(publicKey) : 'Connect your Stellar wallet to view balance'}
           </p>
         </div>
 
-        {/* Balance Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
             <div className="flex items-center justify-between mb-4">
@@ -84,11 +85,10 @@ const WalletBalance = () => {
           </div>
         </div>
 
-        {/* Status & Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Account Status</h3>
-            
+
             <div className="space-y-4">
               <div className="flex items-center justify-between p-3 bg-green-600 bg-opacity-20 rounded-lg border border-green-600">
                 <div className="flex items-center space-x-2">
@@ -114,16 +114,16 @@ const WalletBalance = () => {
 
           <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
-            
+
             <div className="space-y-3">
               <button className="w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg transition-colors flex items-center justify-center font-semibold">
                 <Plus className="h-5 w-5 mr-2" />
                 Add Funds
               </button>
-              
+
               {connected && publicKey && (
-                <a 
-                  href={`https://explorer.stellar.org/address/${publicKey.toBase58()}?cluster=devnet`}
+                <a
+                  href={getStellarAccountExplorerUrl(publicKey)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full bg-gray-700 hover:bg-gray-600 text-white p-4 rounded-lg transition-colors flex items-center justify-center font-semibold"
@@ -133,22 +133,20 @@ const WalletBalance = () => {
                 </a>
               )}
             </div>
-
           </div>
         </div>
 
-        {/* Transaction History */}
         <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-semibold text-white">Recent Transactions</h3>
             {connected && publicKey && (
-              <a 
-                href={`https://explorer.stellar.org/address/${publicKey.toBase58()}?cluster=devnet`}
+              <a
+                href={getStellarAccountExplorerUrl(publicKey)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-400 hover:text-blue-300 transition-colors text-sm"
               >
-                View on Stellar Explorer →
+                View on Stellar Explorer
               </a>
             )}
           </div>
@@ -162,12 +160,13 @@ const WalletBalance = () => {
                     tx.type === 'deposit' ? 'bg-blue-600' :
                     tx.type === 'staking' ? 'bg-purple-600' : 'bg-red-600'
                   }`}>
-                    {tx.type === 'earning' || tx.type === 'deposit' ? 
-                      <ArrowUpRight className="h-4 w-4 text-white" /> :
+                    {tx.type === 'earning' || tx.type === 'deposit' ? (
+                      <ArrowUpRight className="h-4 w-4 text-white" />
+                    ) : (
                       <ArrowDownLeft className="h-4 w-4 text-white" />
-                    }
+                    )}
                   </div>
-                  
+
                   <div>
                     <div className="text-white font-medium">{tx.description}</div>
                     <div className="text-xs text-gray-400">
@@ -177,9 +176,7 @@ const WalletBalance = () => {
                 </div>
 
                 <div className="text-right">
-                  <div className={`font-semibold ${
-                    tx.amount > 0 ? 'text-green-400' : 'text-red-400'
-                  }`}>
+                  <div className={`font-semibold ${tx.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
                     {tx.amount > 0 ? '+' : ''}{tx.amount.toFixed(3)} XLM
                   </div>
                   <div className="text-xs text-gray-400 capitalize">{tx.status}</div>

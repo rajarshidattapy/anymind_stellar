@@ -1,24 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { AlertCircle, ExternalLink, MessageSquare, Play, Star, TrendingUp, User } from 'lucide-react';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { useStellarWallet } from '../contexts/StellarWalletContext';
 import { useCapsuleQuery } from '../hooks/useCapsuleQuery';
 import { useApiClient } from '../lib/api';
-import { getSolanaExplorerUrl } from '../utils/solanaPayment';
-import { getStellarExplorerUrl } from '../utils/stellarPayment';
+import { useWallet } from '../contexts/WalletContextProvider';
 
 const CapsuleDetail = () => {
   const { id } = useParams();
-  const { connected } = useWallet();
-  const {
-    address: stellarAddress,
-    connected: stellarConnected,
-    connecting: stellarConnecting,
-    connect: connectStellarWallet,
-  } = useStellarWallet();
+  const { publicKey, connected, connecting, connect } = useWallet();
   const apiClient = useApiClient();
-  const { queryWithPayment, loading: queryLoading, error: queryError, clearError } = useCapsuleQuery();
+  const { queryWithPayment, loading: queryLoading, error: queryError, clearError, getStellarExplorerUrl } = useCapsuleQuery();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'trial' | 'reviews'>('overview');
   const [capsule, setCapsule] = useState<any>(null);
@@ -26,7 +17,6 @@ const CapsuleDetail = () => {
   const [capsuleError, setCapsuleError] = useState<string | null>(null);
   const [question, setQuestion] = useState('');
   const [queryResponse, setQueryResponse] = useState<string | null>(null);
-  const [txSignature, setTxSignature] = useState<string | null>(null);
   const [stellarTxHash, setStellarTxHash] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
 
@@ -49,7 +39,7 @@ const CapsuleDetail = () => {
         id,
         name: 'DeFi Yield Farming Expert',
         category: 'Finance',
-        creator_wallet: 'Demo_Creator_Wallet',
+        creator_wallet: 'GDemoCreatorWalletAddress0000000000000000000000000000',
         reputation: 98,
         stake_amount: 1200,
         price_per_query: 0.05,
@@ -73,19 +63,17 @@ const CapsuleDetail = () => {
     }
   };
 
-  const canQueryCapsule = connected || stellarConnected;
-
   const shortenAddress = (address: string) => {
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
   };
 
-  const handleConnectStellar = async () => {
-    await connectStellarWallet();
+  const handleConnectWallet = async () => {
+    await connect();
   };
 
   const handleQuerySubmit = async () => {
-    if (!canQueryCapsule) {
-      alert('Please connect a Solana or Stellar wallet first');
+    if (!connected) {
+      alert('Please connect a Stellar wallet first');
       return;
     }
 
@@ -96,7 +84,6 @@ const CapsuleDetail = () => {
 
     clearError();
     setQueryResponse(null);
-    setTxSignature(null);
     setStellarTxHash(null);
     setPaymentMethod(null);
 
@@ -109,7 +96,6 @@ const CapsuleDetail = () => {
 
     if (result) {
       setQueryResponse(result.response);
-      setTxSignature(result.txSignature || null);
       setStellarTxHash(result.stellar_tx_hash || null);
       setPaymentMethod(result.payment_method || null);
       setQuestion('');
@@ -197,7 +183,7 @@ const CapsuleDetail = () => {
             <div className="text-right">
               <div className="text-2xl font-bold text-white mb-1">${capsule.price_per_query} USDC</div>
               <div className="text-gray-400 text-sm">per query (Stellar x402)</div>
-              <div className="text-gray-500 text-xs mt-1">or {capsule.price_per_query} SOL (legacy)</div>
+              <div className="text-gray-500 text-xs mt-1">Settled on Stellar testnet</div>
               <div className="mt-4 space-x-3">
                 <button
                   className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
@@ -220,7 +206,7 @@ const CapsuleDetail = () => {
             {capsule.stake_amount !== undefined && (
               <div className="bg-gray-700 rounded-lg p-4 text-center">
                 <div className="text-2xl font-bold text-green-400">{capsule.stake_amount}</div>
-                <div className="text-sm text-gray-400">SOL Staked</div>
+                <div className="text-sm text-gray-400">XLM Staked</div>
               </div>
             )}
             {capsule.query_count !== undefined && (
@@ -297,7 +283,7 @@ const CapsuleDetail = () => {
               <div className="space-y-6">
                 <div className="text-center mb-8">
                   <div className="bg-green-600 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
-                    ✓
+                    OK
                   </div>
                   <h3 className="text-xl font-semibold text-white mb-2">Try This Capsule</h3>
                   <p className="text-gray-400">
@@ -308,28 +294,28 @@ const CapsuleDetail = () => {
                   {capsule.price_per_query > 0 && (
                     <div className="mt-3 space-y-3">
                       <p className="text-gray-500 text-xs">
-                        {stellarConnected && stellarAddress
-                          ? `Stellar wallet connected for x402: ${shortenAddress(stellarAddress)}`
-                          : 'Connect a Stellar wallet for x402, or use a Solana wallet for the legacy fallback flow.'}
+                        {connected && publicKey
+                          ? `Stellar wallet connected: ${shortenAddress(publicKey)}`
+                          : 'Connect a Stellar wallet to complete the x402 payment flow.'}
                       </p>
-                      {!stellarConnected && (
+                      {!connected && (
                         <button
-                          onClick={() => void handleConnectStellar()}
-                          disabled={stellarConnecting}
+                          onClick={() => void handleConnectWallet()}
+                          disabled={connecting}
                           className="inline-flex items-center justify-center rounded-lg border border-green-500/40 bg-green-500/10 px-4 py-2 text-sm font-medium text-green-300 transition-colors hover:bg-green-500/20 disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                          {stellarConnecting ? 'Connecting Stellar...' : 'Connect Stellar Wallet'}
+                          {connecting ? 'Connecting Stellar...' : 'Connect Stellar Wallet'}
                         </button>
                       )}
                     </div>
                   )}
                 </div>
 
-                {!canQueryCapsule && (
+                {!connected && (
                   <div className="bg-yellow-600 bg-opacity-20 border border-yellow-500 rounded-lg p-4 mb-4 flex items-start">
                     <AlertCircle className="h-5 w-5 text-yellow-400 mr-3 mt-0.5" />
                     <div className="text-yellow-200">
-                      Connect a Solana or Stellar wallet to query this capsule
+                      Connect a Stellar wallet to query this capsule
                     </div>
                   </div>
                 )}
@@ -348,18 +334,8 @@ const CapsuleDetail = () => {
                       <div className="flex items-center gap-3">
                         {paymentMethod && (
                           <span className="text-xs px-2 py-1 rounded bg-gray-700 text-gray-300">
-                            Paid via {paymentMethod === 'stellar_x402' ? 'Stellar USDC' : 'Solana SOL'}
+                            Paid via Stellar USDC
                           </span>
-                        )}
-                        {txSignature && (
-                          <a
-                            href={getSolanaExplorerUrl(txSignature, 'devnet')}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center text-sm text-blue-400 hover:text-blue-300"
-                          >
-                            View on Solana <ExternalLink className="h-4 w-4 ml-1" />
-                          </a>
                         )}
                         {stellarTxHash && (
                           <a
@@ -399,12 +375,12 @@ const CapsuleDetail = () => {
                     placeholder="Ask your own question..."
                     value={question}
                     onChange={(event) => setQuestion(event.target.value)}
-                    disabled={queryLoading || !canQueryCapsule}
+                    disabled={queryLoading || !connected}
                     className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none mb-4 disabled:opacity-50"
                   />
                   <button
                     onClick={handleQuerySubmit}
-                    disabled={queryLoading || !canQueryCapsule || !question.trim()}
+                    disabled={queryLoading || !connected || !question.trim()}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full"
                   >
                     {queryLoading

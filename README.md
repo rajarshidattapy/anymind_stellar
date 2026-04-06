@@ -6,7 +6,7 @@ It enables developers and creators to build stateful AI agents, package their in
 
 Built across **AI infra + Web3 rails + developer tooling**, Anymind combines:
 
-- **Solana** for wallet-authenticated identity, staking, and reputation
+- **Stellar** for wallet-authenticated identity, staking signals, and reputation
 - **Stellar x402** for USDC micropayments with sponsored fees
 - **FastAPI + Supabase + Redis** for backend orchestration and state
 - **React + Vite** for a fast, wallet-native frontend
@@ -100,15 +100,15 @@ Client request
 → facilitator settlement  
 → response delivery
 
-#### Fallback: Solana legacy flow
+#### Wallet Flow
 
-Used for broader wallet-native compatibility.
+Stellar Wallets Kit powers connection, account identity, and signing across the frontend.
 
 ---
 
 ### 5. Staking + Reputation
 
-Creators and capsules can participate in Solana staking flows.
+Creators and capsules can participate in Stellar-first staking flows.
 
 Staking powers:
 
@@ -129,7 +129,7 @@ This creates an economic trust layer around intelligence.
 - TypeScript
 - Vite
 - Tailwind CSS
-- Solana Wallet Adapter
+- Stellar Wallets Kit
 - Stellar Wallets Kit
 
 ### Backend
@@ -143,8 +143,8 @@ This creates an economic trust layer around intelligence.
 
 ### Blockchain + Payments
 
-- Solana devnet
-- Anchor smart contracts
+- Stellar testnet
+- Soroban migration in progress
 - Stellar x402
 - OpenZeppelin Channels facilitator
 
@@ -170,7 +170,7 @@ This creates an economic trust layer around intelligence.
 │   │   └── services/        Core business logic
 │   └── supabase/            SQL migrations
 │
-├── contracts/               Solana smart contracts
+├── contracts/               Legacy contracts / migration work
 ├── anymind-sdk/             Python SDK
 ├── wallet.md
 └── vercel.json
@@ -191,7 +191,7 @@ This creates an economic trust layer around intelligence.
 
 Optional:
 
-- Phantom wallet
+- Freighter or another Stellar-compatible wallet
 - Stellar-compatible wallet
 
 ---
@@ -239,8 +239,7 @@ OPENROUTER_API_KEY=...
 MEM0_API_KEY=...
 TAVILY_API_KEY=...
 
-SOLANA_RPC_URL=https://api.devnet.solana.com
-SOLANA_NETWORK=devnet
+STELLAR_HORIZON_URL=https://horizon-testnet.stellar.org
 
 STELLAR_PAY_TO_ADDRESS=...
 STELLAR_NETWORK=stellar:testnet
@@ -381,4 +380,3 @@ Instead of isolated prompts, intelligence becomes:
 - economically native
 
 The long-term goal is to make AI agents function like programmable digital entities.
-

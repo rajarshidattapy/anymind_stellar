@@ -102,9 +102,11 @@ class Settings(BaseSettings):
     # Mem0 Platform API Key (for hosted memory service)
     MEM0_API_KEY: str = os.getenv("MEM0_API_KEY", "")
     
-    # Solana
-    SOLANA_RPC_URL: str = os.getenv("SOLANA_RPC_URL", "https://api.devnet.solana.com")
-    SOLANA_NETWORK: str = os.getenv("SOLANA_NETWORK", "devnet")
+    # Stellar
+    STELLAR_HORIZON_URL: str = os.getenv(
+        "STELLAR_HORIZON_URL",
+        "https://horizon-testnet.stellar.org"
+    )
     
     # Stellar x402 Payments
     STELLAR_PAY_TO_ADDRESS: str = os.getenv("STELLAR_PAY_TO_ADDRESS", "")

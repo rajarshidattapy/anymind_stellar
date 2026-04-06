@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Brain, Store, Wallet, Settings, MessageSquare, Coins, TrendingUp, ArrowLeft, Plus, X } from 'lucide-react';
-import { useSolanaBalance } from '../hooks/useSolanaBalance';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useStellarBalance } from '../hooks/useStellarBalance';
+import { useWallet } from '../contexts/WalletContextProvider';
 import { useApiClient } from '../lib/api';
 import appLogo from '../assets/stellarmind.png';
 import InfoIcon from './InfoIcon';
@@ -25,8 +25,8 @@ interface NavbarProps {
 }
 
 const BalanceDisplay = () => {
-  const { balance, loading } = useSolanaBalance();
-  const { connected } = useWallet();
+  const { publicKey, connected } = useWallet();
+  const { balance, loading } = useStellarBalance(publicKey);
   
   // Log balance changes for debugging
   useEffect(() => {
@@ -51,7 +51,7 @@ const BalanceDisplay = () => {
     <div className="bg-gray-900 rounded-lg px-4 py-2 border border-gray-600">
       <div className="text-sm text-gray-400">Balance</div>
       <div className="text-lg font-semibold text-white" key={balance}>
-        {loading ? '...' : connected ? `${formatBalance(balance)} SOL` : 'N/A'}
+        {loading ? '...' : connected ? `${formatBalance(balance)} XLM` : 'N/A'}
       </div>
     </div>
   );

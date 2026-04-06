@@ -24,8 +24,8 @@ export default function DevelopersPage() {
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
-  const cloneCode = `git clone https://github.com/rajarshidattapy/Sol_mind.git
-cd Sol_mind/anymind-sdk`;
+  const cloneCode = `git clone https://github.com/rajarshidattapy/anymind_stellar.git
+cd anymind_stellar/anymind-sdk`;
   const installationCode = `pip install -e .`;
   const usageCode = `from anymind import Agent
 
@@ -33,7 +33,7 @@ cd Sol_mind/anymind-sdk`;
 agent = Agent(
     agent_id="your-agent-id",
     chat_id="your-chat-id",
-    wallet_address="YourSolanaWalletAddress",
+    wallet_address="YourStellarAccountID",
     base_url="http://localhost:8000"  # Optional: defaults to localhost:8000
 )
 
@@ -48,7 +48,7 @@ print(response)`;
 agent = Agent(
     agent_id="custom-1da9863b",
     chat_id="fe361c2a-4265-41e7-b260-76fd64357688",
-    wallet_address="5UMbS37mHgE5WCiwPUibRCSwGJNm5u76UKgwrents2ok",
+    wallet_address="GBRPYHIL2C2A7L3S37JQZKJQBTQUL4H2WQX4J4S6CGN2VZ5F3M6V4T6D",
     base_url="http://localhost:8000"
 )
 
@@ -237,7 +237,7 @@ print(response)`;
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-blue-400 mt-1">•</span>
-                    <span>Solana wallet authentication</span>
+                    <span>Stellar wallet authentication</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-blue-400 mt-1">•</span>
@@ -262,7 +262,7 @@ print(response)`;
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-blue-400 mt-1">•</span>
-                    <span>Solana wallet address</span>
+                    <span>Stellar account ID</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-blue-400 mt-1">•</span>
@@ -390,7 +390,7 @@ print(response)`;
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-green-400 mt-0.5">3.</span>
-                      <span>Solana payment fallback is supported for non-Stellar users</span>
+                      <span>Stake XLM to improve capsule visibility in the marketplace</span>
                     </li>
                   </ul>
                 </div>
@@ -403,7 +403,7 @@ print(response)`;
             <h2 className="text-3xl font-bold mb-8">Resources</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <a
-                href="https://github.com/rajarshidattapy/Sol_mind"
+                href="https://github.com/rajarshidattapy/anymind_stellar"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-gray-800 border border-gray-700 rounded-xl p-6 hover:border-blue-600/50 transition-colors group"

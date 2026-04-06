@@ -39,11 +39,9 @@ services:
         sync: false  # Set this manually in Render dashboard
       - key: UPSTASH_REDIS_REST_TOKEN
         sync: false  # Set this manually in Render dashboard
-      # Solana Configuration
-      - key: SOLANA_RPC_URL
-        value: https://api.devnet.solana.com
-      - key: SOLANA_NETWORK
-        value: devnet
+      # Stellar Network Configuration
+      - key: STELLAR_HORIZON_URL
+        value: https://horizon-testnet.stellar.org
       # Stellar x402 Payments
       - key: STELLAR_PAY_TO_ADDRESS
         sync: false  # Set this manually in Render dashboard

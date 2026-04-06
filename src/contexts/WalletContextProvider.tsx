@@ -1,34 +1,28 @@
-import { FC, ReactNode, useMemo } from 'react';
-import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
-import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
-import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
-import { clusterApiUrl } from '@solana/web3.js';
-
-// Import wallet adapter CSS
-import '@solana/wallet-adapter-react-ui/styles.css';
+import { ReactNode } from 'react';
+import { StellarWalletProvider, useStellarWallet } from './StellarWalletContext';
 
 interface WalletContextProviderProps {
   children: ReactNode;
 }
 
-export const WalletContextProvider: FC<WalletContextProviderProps> = ({ children }) => {
-  // Use devnet for testing
-  const endpoint = useMemo(() => clusterApiUrl('devnet'), []);
+export function WalletContextProvider({ children }: WalletContextProviderProps) {
+  return <StellarWalletProvider>{children}</StellarWalletProvider>;
+}
 
-  const wallets = useMemo(
-    () => [
-      new PhantomWalletAdapter(),
-    ],
-    []
-  );
+export function useWallet() {
+  const wallet = useStellarWallet();
 
-  return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>
-          {children}
-        </WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
-  );
-};
+  return {
+    publicKey: wallet.address,
+    address: wallet.address,
+    connected: wallet.connected,
+    connecting: wallet.connecting,
+    walletId: wallet.walletId,
+    supportedWallets: wallet.supportedWallets,
+    hasAvailableWallet: wallet.hasAvailableWallet,
+    connect: wallet.connect,
+    disconnect: wallet.disconnect,
+    refreshAddress: wallet.refreshAddress,
+    openProfile: wallet.openProfile,
+  };
+}
