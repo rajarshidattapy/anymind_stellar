@@ -1,0 +1,54 @@
+services:
+  - type: web
+    name: solmind-backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /health
+    envVars:
+      # Note: PORT is automatically set by Render - don't override it
+      - key: HOST
+        value: 0.0.0.0
+      - key: DEBUG
+        value: false
+      - key: ENVIRONMENT
+        value: production
+      # CORS Configuration - Frontend URLs
+      - key: CORS_ORIGINS
+        value: https://solmind-nu.vercel.app
+      # Supabase Configuration
+      - key: VITE_SUPABASE_URL
+        sync: false  # Set this manually in Render dashboard
+      - key: VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+        sync: false  # Set this manually in Render dashboard
+      - key: SUPABASE_SERVICE_KEY
+        sync: false  # Set this manually in Render dashboard
+      # API Keys
+      - key: OPENROUTER_API_KEY
+        sync: false  # Set this manually in Render dashboard
+      - key: MEM0_API_KEY
+        sync: false  # Set this manually in Render dashboard
+      - key: TAVILY_API_KEY
+        sync: false  # Set this manually in Render dashboard
+      # Redis/Vercel KV Configuration
+      - key: KV_REST_API_URL
+        sync: false  # Set this manually in Render dashboard
+      - key: KV_REST_API_TOKEN
+        sync: false  # Set this manually in Render dashboard
+      # Alternative Redis variable names
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false  # Set this manually in Render dashboard
+      - key: UPSTASH_REDIS_REST_TOKEN
+        sync: false  # Set this manually in Render dashboard
+      # Solana Configuration
+      - key: SOLANA_RPC_URL
+        value: https://api.devnet.solana.com
+      - key: SOLANA_NETWORK
+        value: devnet
+      # JWT Configuration
+      - key: SECRET_KEY
+        generateValue: true  # Render will generate a secure key
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 30
+
