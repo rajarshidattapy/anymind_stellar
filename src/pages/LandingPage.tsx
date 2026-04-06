@@ -50,8 +50,8 @@ export default function LandingPage() {
       <header className="fixed top-0 w-full z-50 border-b border-gray-800 bg-gray-900/80 backdrop-blur-md">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src={appLogo} alt="SolMind" className="w-8 h-8" />
-            <span className="text-xl font-bold tracking-tight">SolMind</span>
+            <img src={appLogo} alt="Anymind" className="w-8 h-8" />
+            <span className="text-xl font-bold tracking-tight">Anymind</span>
           </div>
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-400">
             <a href="marketplace" className="hover:text-gray-100 transition-colors">
@@ -112,7 +112,7 @@ export default function LandingPage() {
             Turn AI conversations into <span className="text-blue-400">on-chain intelligence.</span>
           </h1>
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
-            SolMind is a Solana-native AI intelligence marketplace. Chat with agents, package long-term intelligence
+            Anymind is a Solana-native AI intelligence marketplace. Chat with agents, package long-term intelligence
             into capsules, and monetize them as revenue-generating assets.
           </p>
           <div className="flex flex-row items-center justify-center gap-6 mt-8">
@@ -145,14 +145,14 @@ export default function LandingPage() {
                 </div>
                 <div className="flex items-center gap-2 text-xs text-gray-400 ml-4 bg-gray-900 px-3 py-1 rounded-md border border-gray-800">
                   <Terminal className="w-3 h-3" />
-                  solmind-agent.py
+                  anymind-agent.py
                 </div>
               </div>
               <div className="grid md:grid-cols-[1fr_300px]">
                 <div className="p-6 text-left font-mono text-sm leading-relaxed overflow-x-auto">
                   <div className="flex gap-4">
                     <span className="text-gray-500">1</span>
-                    <span className="text-blue-400">from</span> solmind <span className="text-blue-400">import</span> Agent
+                    <span className="text-blue-400">from</span> anymind <span className="text-blue-400">import</span> Agent
                   </div>
                   <div className="flex gap-4">
                     <span className="text-gray-500">2</span>
@@ -172,7 +172,7 @@ export default function LandingPage() {
                   </div>
                   <div className="flex gap-4 pl-4">
                     <span className="text-gray-500">6</span>
-                    &nbsp;&nbsp;&nbsp;&nbsp;base_url=<span className="text-green-400">"solmind.ai"</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;base_url=<span className="text-green-400">"anymind.ai"</span>
                   </div>
                   <div className="flex gap-4">
                     <span className="text-gray-500">7</span>
@@ -239,7 +239,7 @@ export default function LandingPage() {
             <div className="max-w-xl">
               <h2 className="text-4xl font-bold tracking-tight mb-4">The lifecycle of intelligence.</h2>
               <p className="text-gray-400">
-                SolMind turns ephemeral chats into persistent, composable, and revenue-generating primitives.
+                Anymind turns ephemeral chats into persistent, composable, and revenue-generating primitives.
               </p>
             </div>
             <button className="text-gray-400 hover:text-gray-100 transition-colors group">
@@ -418,7 +418,7 @@ export default function LandingPage() {
                   <Github className="w-3 h-3" />
                   Open Source SDK
                 </div>
-                <h2 className="text-3xl font-bold tracking-tight mb-4">Build on SolMind</h2>
+                <h2 className="text-3xl font-bold tracking-tight mb-4">Build on Anymind</h2>
                 <p className="text-gray-400 mb-8">
                   Our TypeScript SDK makes it easy to create, query, and monetize intelligence capsules. Full Solana
                   integration out of the box.
@@ -439,7 +439,7 @@ export default function LandingPage() {
               <div className="bg-gray-900 p-8 font-mono text-sm leading-relaxed border-l border-gray-800">
                 <div className="text-gray-400 mb-4">// Quick start</div>
                 <div>
-                  <span className="text-blue-400">npm install</span> @solmind/sdk
+                  <span className="text-blue-400">npm install</span> @anymind/sdk
                 </div>
                 <div className="mt-4 text-gray-400">// Query a capsule</div>
                 <div>
@@ -460,8 +460,8 @@ export default function LandingPage() {
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-2">
-              <img src={appLogo} alt="SolMind" className="w-6 h-6" />
-              <span className="font-bold">SolMind</span>
+              <img src={appLogo} alt="Anymind" className="w-6 h-6" />
+              <span className="font-bold">Anymind</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-gray-400">
               <a href="#" className="hover:text-gray-100 transition-colors">
@@ -477,7 +477,7 @@ export default function LandingPage() {
                 Twitter
               </a>
             </div>
-            <div className="text-xs text-gray-500">© 2024 SolMind Protocol. All rights reserved.</div>
+            <div className="text-xs text-gray-500">© 2024 Anymind Protocol. All rights reserved.</div>
           </div>
         </div>
       </footer>

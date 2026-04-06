@@ -246,7 +246,7 @@ const Staking = () => {
               <TrendingUp className="h-5 w-5 text-green-400" />
               <span className="text-gray-400">Platform</span>
             </div>
-            <div className="text-2xl font-bold text-white">SolMind</div>
+            <div className="text-2xl font-bold text-white">Anymind</div>
             <div className="text-sm text-gray-400">Marketplace</div>
           </div>
         </div>

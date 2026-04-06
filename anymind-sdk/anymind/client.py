@@ -1,8 +1,8 @@
 import requests
-from .errors import AuthenticationError, SolmindRuntimeError
+from .errors import AuthenticationError, AnymindRuntimeError
 
 
-class SolmindClient:
+class AnymindClient:
     def __init__(self, wallet_address: str, base_url: str):
         self.wallet_address = wallet_address
         self.base_url = base_url.rstrip("/")
@@ -22,10 +22,10 @@ class SolmindClient:
             raise AuthenticationError("Wallet address required or invalid")
 
         if resp.status_code == 404:
-            raise SolmindRuntimeError(f"Resource not found: {resp.text}")
+            raise AnymindRuntimeError(f"Resource not found: {resp.text}")
 
         if resp.status_code != 200:
-            raise SolmindRuntimeError(f"API error ({resp.status_code}): {resp.text}")
+            raise AnymindRuntimeError(f"API error ({resp.status_code}): {resp.text}")
 
         return resp.json()
 

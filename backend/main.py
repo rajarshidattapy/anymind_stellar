@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    logger.info("Starting SolMind API...")
+    logger.info("Starting Anymind API...")
     await init_db()
     
     # Initialize memory service (warm up)
@@ -43,12 +43,12 @@ async def lifespan(app: FastAPI):
     
     yield
     # Shutdown
-    logger.info("Shutting down SolMind API...")
+    logger.info("Shutting down Anymind API...")
 
 
 app = FastAPI(
-    title="SolMind API",
-    description="Backend API for SolMind is running!",
+    title="Anymind API",
+    description="Backend API for Anymind is running!",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -74,7 +74,7 @@ app.include_router(preferences.router, prefix="/api/v1", tags=["Preferences"])
 @app.get("/")
 async def root():
     return {
-        "message": "SolMind API",
+        "message": "Anymind API",
         "version": "1.0.0",
         "status": "running"
     }

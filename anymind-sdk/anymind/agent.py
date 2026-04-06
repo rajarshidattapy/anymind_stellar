@@ -1,4 +1,4 @@
-from .client import SolmindClient
+from .client import AnymindClient
 from .types import ChatResponse
 
 
@@ -20,7 +20,7 @@ class Agent:
     ):
         self.agent_id = agent_id
         self.chat_id = chat_id
-        self.client = SolmindClient(wallet_address, base_url)
+        self.client = AnymindClient(wallet_address, base_url)
 
     def chat(self, message: str) -> str:
         """

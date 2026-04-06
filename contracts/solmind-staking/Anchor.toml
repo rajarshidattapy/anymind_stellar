@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-solmind_staking = "C8NqjFTmhBkVGE5V5dR4zT2un7WHpsYe5oqVGwiZEUFE"
+anymind_staking = "C8NqjFTmhBkVGE5V5dR4zT2un7WHpsYe5oqVGwiZEUFE"
 
 [registry]
 url = "https://api.apr.dev"

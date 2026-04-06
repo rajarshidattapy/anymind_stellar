@@ -88,7 +88,7 @@ class MemoryService:
                     "vector_store": {
                         "provider": "chroma",
                         "config": {
-                            "collection_name": "solmind_memory",
+                            "collection_name": "anymind_memory",
                             "path": "./.chroma_db"  # Local storage
                         }
                     }

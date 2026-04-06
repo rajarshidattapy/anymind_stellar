@@ -1,6 +1,6 @@
 # Solana Testnet Deployment Guide
 
-This guide will help you deploy the SolMind program to Solana testnet.
+This guide will help you deploy the Anymind program to Solana testnet.
 
 ## Prerequisites
 
@@ -69,7 +69,7 @@ declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 If you need to generate a new program ID:
 ```powershell
 cd contracts
-solana-keygen new -o target/deploy/solmind-keypair.json
+solana-keygen new -o target/deploy/anymind-keypair.json
 anchor keys list
 ```
 
@@ -85,7 +85,7 @@ anchor build
 anchor deploy --provider.cluster testnet
 
 # Or use solana deploy directly
-solana program deploy target/deploy/solmind.so --url testnet
+solana program deploy target/deploy/anymind.so --url testnet
 ```
 
 ### 5. Verify Deployment

@@ -203,8 +203,8 @@ const Navbar: React.FC<NavbarProps> = ({
               >
                 <ArrowLeft className="h-6 w-6 text-gray-400 hover:text-blue-400" />
               </Link>
-              <img src={appLogo} alt="SolMind" className="h-8 w-8" />
-              <span className="text-xl font-bold text-white">SolMind</span>
+              <img src={appLogo} alt="Anymind" className="h-8 w-8" />
+              <span className="text-xl font-bold text-white">Anymind</span>
             </div>
             
             <div className="flex items-center space-x-1">

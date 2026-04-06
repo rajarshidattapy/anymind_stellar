@@ -6,7 +6,7 @@ declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 // CONSTANTS
 // ============================================================================
 
-/// Production constants for SolMind
+/// Production constants for Anymind
 pub mod constants {
 
     /// Maximum price per query (100 SOL = 100_000_000_000 lamports)
@@ -30,7 +30,7 @@ pub mod constants {
 // ============================================================================
 
 #[error_code]
-pub enum SolMindError {
+pub enum AnymindError {
     #[msg("Invalid agent owner")]
     InvalidAgentOwner,
     
@@ -255,10 +255,10 @@ impl Earnings {
     pub fn add_earnings(&mut self, amount: u64) -> Result<()> {
         self.total_earnings = self.total_earnings
             .checked_add(amount)
-            .ok_or(SolMindError::MathOverflow)?;
+            .ok_or(AnymindError::MathOverflow)?;
         self.query_count = self.query_count
             .checked_add(1)
-            .ok_or(SolMindError::MathOverflow)?;
+            .ok_or(AnymindError::MathOverflow)?;
         self.last_updated = Clock::get()?.unix_timestamp;
         Ok(())
     }
@@ -296,19 +296,19 @@ pub fn register_agent(
     // Validate non-empty strings
     require!(
         !agent_id.trim().is_empty() && agent_id.len() >= constants::MIN_STRING_LENGTH,
-        SolMindError::EmptyString
+        AnymindError::EmptyString
     );
     require!(
         !name.trim().is_empty() && name.len() >= constants::MIN_STRING_LENGTH,
-        SolMindError::EmptyString
+        AnymindError::EmptyString
     );
     require!(
         !display_name.trim().is_empty() && display_name.len() >= constants::MIN_STRING_LENGTH,
-        SolMindError::EmptyString
+        AnymindError::EmptyString
     );
     require!(
         !platform.trim().is_empty() && platform.len() >= constants::MIN_STRING_LENGTH,
-        SolMindError::EmptyString
+        AnymindError::EmptyString
     );
     
     // Validate maximum lengths
@@ -317,19 +317,19 @@ pub fn register_agent(
     // must each be <= 32 bytes, otherwise the instruction will fail on-chain.
     require!(
         agent_id.len() <= 32,
-        SolMindError::InvalidMetadataLength
+        AnymindError::InvalidMetadataLength
     );
     require!(
         name.len() <= 128,
-        SolMindError::InvalidMetadataLength
+        AnymindError::InvalidMetadataLength
     );
     require!(
         display_name.len() <= 128,
-        SolMindError::InvalidMetadataLength
+        AnymindError::InvalidMetadataLength
     );
     require!(
         platform.len() <= 32,
-        SolMindError::InvalidMetadataLength
+        AnymindError::InvalidMetadataLength
     );
 
     let agent = &mut ctx.accounts.agent;
@@ -377,19 +377,19 @@ pub fn create_capsule(
     // Validate non-empty strings
     require!(
         !capsule_id.trim().is_empty() && capsule_id.len() >= constants::MIN_STRING_LENGTH,
-        SolMindError::EmptyString
+        AnymindError::EmptyString
     );
     require!(
         !name.trim().is_empty() && name.len() >= constants::MIN_STRING_LENGTH,
-        SolMindError::EmptyString
+        AnymindError::EmptyString
     );
     require!(
         !description.trim().is_empty() && description.len() >= constants::MIN_STRING_LENGTH,
-        SolMindError::EmptyString
+        AnymindError::EmptyString
     );
     require!(
         !category.trim().is_empty() && category.len() >= constants::MIN_STRING_LENGTH,
-        SolMindError::EmptyString
+        AnymindError::EmptyString
     );
     
     // Validate maximum lengths
@@ -398,29 +398,29 @@ pub fn create_capsule(
     // must each be <= 32 bytes, otherwise the instruction will fail on-chain.
     require!(
         capsule_id.len() <= 32,
-        SolMindError::InvalidMetadataLength
+        AnymindError::InvalidMetadataLength
     );
     require!(
         name.len() <= 128,
-        SolMindError::InvalidMetadataLength
+        AnymindError::InvalidMetadataLength
     );
     require!(
         description.len() <= 512,
-        SolMindError::InvalidMetadataLength
+        AnymindError::InvalidMetadataLength
     );
     require!(
         category.len() <= 32,
-        SolMindError::InvalidMetadataLength
+        AnymindError::InvalidMetadataLength
     );
     
     // Validate price range
     require!(
         price_per_query >= constants::MIN_PRICE_PER_QUERY,
-        SolMindError::InvalidPrice
+        AnymindError::InvalidPrice
     );
     require!(
         price_per_query <= constants::MAX_PRICE_PER_QUERY,
-        SolMindError::PriceTooHigh
+        AnymindError::PriceTooHigh
     );
 
     let capsule = &mut ctx.accounts.capsule;
@@ -468,11 +468,11 @@ pub fn stake_on_capsule(
     // Validate stake amount range
     require!(
         amount >= constants::MIN_STAKE_AMOUNT,
-        SolMindError::InsufficientStake
+        AnymindError::InsufficientStake
     );
     require!(
         amount <= constants::MAX_STAKE_AMOUNT,
-        SolMindError::StakeTooHigh
+        AnymindError::StakeTooHigh
     );
 
     // Check staker has enough balance (need amount + rent if staking account is new)
@@ -484,7 +484,7 @@ pub fn stake_on_capsule(
     
     require!(
         ctx.accounts.staker.lamports() >= required_balance,
-        SolMindError::InsufficientPayment
+        AnymindError::InsufficientPayment
     );
     
     let capsule = &mut ctx.accounts.capsule;
@@ -504,11 +504,11 @@ pub fn stake_on_capsule(
         // Add to existing stake - extend lock period
         staking.amount = staking.amount
             .checked_add(amount)
-            .ok_or(SolMindError::MathOverflow)?;
+            .ok_or(AnymindError::MathOverflow)?;
         let now = Clock::get()?.unix_timestamp;
         staking.lock_until = now
             .checked_add(Staking::LOCK_PERIOD_SECONDS)
-            .ok_or(SolMindError::MathOverflow)?;
+            .ok_or(AnymindError::MathOverflow)?;
     }
 
     // Transfer SOL from staker to staking PDA account using Anchor's transfer
@@ -528,7 +528,7 @@ pub fn stake_on_capsule(
     // Update capsule total stake
     capsule.total_stake = capsule.total_stake
         .checked_add(amount)
-        .ok_or(SolMindError::MathOverflow)?;
+        .ok_or(AnymindError::MathOverflow)?;
     capsule.updated_at = Clock::get()?.unix_timestamp;
 
     msg!("Staked {} lamports on capsule: {}", amount, capsule.capsule_id);
@@ -542,7 +542,7 @@ pub struct UpdateCapsulePrice<'info> {
     
     #[account(
         mut,
-        has_one = creator @ SolMindError::InvalidCapsuleOwner
+        has_one = creator @ AnymindError::InvalidCapsuleOwner
     )]
     pub capsule: Account<'info, Capsule>,
 }
@@ -554,11 +554,11 @@ pub fn update_capsule_price(
     // Validate price range
     require!(
         new_price >= constants::MIN_PRICE_PER_QUERY,
-        SolMindError::InvalidPrice
+        AnymindError::InvalidPrice
     );
     require!(
         new_price <= constants::MAX_PRICE_PER_QUERY,
-        SolMindError::PriceTooHigh
+        AnymindError::PriceTooHigh
     );
 
     let capsule = &mut ctx.accounts.capsule;
@@ -597,17 +597,17 @@ pub fn withdraw_earnings(ctx: Context<WithdrawEarnings>) -> Result<()> {
     
     require!(
         earnings.wallet == ctx.accounts.creator.key(),
-        SolMindError::Unauthorized
+        AnymindError::Unauthorized
     );
     
     require!(
         earnings.wallet == ctx.accounts.wallet.key(),
-        SolMindError::Unauthorized
+        AnymindError::Unauthorized
     );
     
     require!(
         earnings.total_earnings > 0,
-        SolMindError::InsufficientPayment
+        AnymindError::InsufficientPayment
     );
 
     let amount = earnings.total_earnings;
@@ -617,11 +617,11 @@ pub fn withdraw_earnings(ctx: Context<WithdrawEarnings>) -> Result<()> {
     let rent_exempt_minimum = Rent::get()?.minimum_balance(Earnings::MAX_SIZE);
     let available_balance = earnings_account_info.lamports()
         .checked_sub(rent_exempt_minimum)
-        .ok_or(SolMindError::InsufficientPayment)?;
+        .ok_or(AnymindError::InsufficientPayment)?;
     
     require!(
         available_balance >= amount,
-        SolMindError::InsufficientPayment
+        AnymindError::InsufficientPayment
     );
     
     // Transfer earnings to creator wallet using PDA signing
@@ -663,7 +663,7 @@ pub fn withdraw_earnings(ctx: Context<WithdrawEarnings>) -> Result<()> {
 // ============================================================================
 
 #[program]
-pub mod solmind {
+pub mod anymind {
     use super::*;
 
     /// Register a new AI agent on-chain

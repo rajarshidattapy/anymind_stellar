@@ -16,7 +16,7 @@ class Settings(BaseSettings):
         extra="ignore"  # Ignore extra fields like VITE_* variables
     )
     # App settings
-    APP_NAME: str = "SolMind API"
+    APP_NAME: str = "Anymind API"
     DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
     HOST: str = os.getenv("HOST", "0.0.0.0")
     PORT: int = int(os.getenv("PORT", "8000"))

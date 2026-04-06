@@ -1,4 +1,4 @@
-from solmind import Agent
+from anymind import Agent
 
 # Initialize agent with wallet address for authentication
 agent = Agent(

@@ -25,9 +25,9 @@ export default function DevelopersPage() {
   };
 
   const cloneCode = `git clone https://github.com/rajarshidattapy/Sol_mind.git
-cd Sol_mind/solmind-sdk`;
+cd Sol_mind/anymind-sdk`;
   const installationCode = `pip install -e .`;
-  const usageCode = `from solmind import Agent
+  const usageCode = `from anymind import Agent
 
 # Initialize agent with wallet address for authentication
 agent = Agent(
@@ -42,7 +42,7 @@ agent = Agent(
 response = agent.chat("Your message here")
 print(response)`;
 
-  const exampleCode = `from solmind import Agent
+  const exampleCode = `from anymind import Agent
 
 # Initialize agent with wallet address for authentication
 agent = Agent(
@@ -63,8 +63,8 @@ print(response)`;
       <header className="fixed top-0 w-full z-50 border-b border-gray-800 bg-gray-900/80 backdrop-blur-md">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <img src={appLogo} alt="SolMind" className="w-8 h-8" />
-            <span className="text-xl font-bold tracking-tight">SolMind</span>
+            <img src={appLogo} alt="Anymind" className="w-8 h-8" />
+            <span className="text-xl font-bold tracking-tight">Anymind</span>
           </Link>
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-400">
             <Link to="/" className="hover:text-gray-100 transition-colors">
@@ -96,7 +96,7 @@ print(response)`;
               <h1 className="text-5xl font-bold tracking-tight">Developer Documentation</h1>
             </div>
             <p className="text-xl text-gray-400 max-w-2xl">
-              Build powerful AI applications with SolMind's SDK. Integrate persistent memory capsules into your projects with just a few lines of code.
+              Build powerful AI applications with Anymind's SDK. Integrate persistent memory capsules into your projects with just a few lines of code.
             </p>
           </div>
 
@@ -118,7 +118,7 @@ print(response)`;
                 Clone Repository
               </h3>
               <p className="text-gray-400 mb-4">
-                First, clone the SolMind repository:
+                First, clone the Anymind repository:
               </p>
               <div className="relative">
                 <pre className="bg-gray-900 border border-gray-700 rounded-lg p-4 overflow-x-auto">
@@ -144,7 +144,7 @@ print(response)`;
                 Installation
               </h3>
               <p className="text-gray-400 mb-4">
-                Install the SolMind Python SDK using pip:
+                Install the Anymind Python SDK using pip:
               </p>
               <div className="relative">
                 <pre className="bg-gray-900 border border-gray-700 rounded-lg p-4 overflow-x-auto">
@@ -170,7 +170,7 @@ print(response)`;
                 Quick Start
               </h3>
               <p className="text-gray-400 mb-4">
-                Get started with the SolMind Python SDK in minutes:
+                Get started with the Anymind Python SDK in minutes:
               </p>
               <div className="relative">
                 <pre className="bg-gray-900 border border-gray-700 rounded-lg p-4 overflow-x-auto">
@@ -293,11 +293,11 @@ print(response)`;
                 <div className="flex-1">
                   <h3 className="text-xl font-semibold mb-3">JavaScript/TypeScript Support</h3>
                   <p className="text-gray-400 mb-4 leading-relaxed">
-                    We're working on bringing SolMind to the JavaScript ecosystem! The NPM SDK will provide the same powerful features as the Python SDK, with full TypeScript support and seamless integration with Node.js and browser environments.
+                    We're working on bringing Anymind to the JavaScript ecosystem! The NPM SDK will provide the same powerful features as the Python SDK, with full TypeScript support and seamless integration with Node.js and browser environments.
                   </p>
                   <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-4 mb-4">
                     <p className="text-sm text-gray-300 font-mono">
-                      npm install solmind
+                      npm install anymind
                     </p>
                   </div>
                   <p className="text-sm text-gray-500">
@@ -348,7 +348,7 @@ print(response)`;
           <section className="bg-gradient-to-r from-blue-600/10 to-purple-600/10 border border-blue-600/20 rounded-xl p-8 text-center">
             <h2 className="text-2xl font-bold mb-4">Ready to Build?</h2>
             <p className="text-gray-400 mb-6 max-w-2xl mx-auto">
-              Start integrating SolMind into your applications today. Join our community and start building the future of AI.
+              Start integrating Anymind into your applications today. Join our community and start building the future of AI.
             </p>
             <div className="flex gap-4 justify-center">
               <Link

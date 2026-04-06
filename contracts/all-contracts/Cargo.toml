@@ -1,12 +1,12 @@
 [package]
-name = "solmind"
+name = "anymind"
 version = "0.1.0"
-description = "SolMind - Stateful AI runtime with persistent memory on Solana"
+description = "Anymind - Stateful AI runtime with persistent memory on Solana"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "solmind"
+name = "anymind"
 
 [features]
 no-entrypoint = []

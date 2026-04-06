@@ -1919,7 +1919,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "solmind-staking"
+name = "anymind-staking"
 version = "0.1.0"
 dependencies = [
  "anchor-lang",

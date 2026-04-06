@@ -1,7 +1,7 @@
-# SolMind Testnet Deployment Script
+# Anymind Testnet Deployment Script
 # Run this script after installing prerequisites
 
-Write-Host "=== SolMind Testnet Deployment ===" -ForegroundColor Cyan
+Write-Host "=== Anymind Testnet Deployment ===" -ForegroundColor Cyan
 
 # Check prerequisites
 Write-Host "`nChecking prerequisites..." -ForegroundColor Yellow

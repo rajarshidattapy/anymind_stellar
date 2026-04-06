@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 declare_id!("C8NqjFTmhBkVGE5V5dR4zT2un7WHpsYe5oqVGwiZEUFE");
 
 #[program]
-pub mod solmind_staking {
+pub mod anymind_staking {
     use super::*;
 
     /// Initialize a staking pool for a capsule

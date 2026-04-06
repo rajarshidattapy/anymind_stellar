@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: solmind-backend
+    name: anymind-backend
     dockerfilePath: ./Dockerfile
     dockerContext: ./backend
     healthCheckPath: /health
@@ -14,7 +14,7 @@ services:
         value: production
       # CORS Configuration - Frontend URLs
       - key: CORS_ORIGINS
-        value: https://solmind-nu.vercel.app
+        value: https://anymind-nu.vercel.app
       # Supabase Configuration
       - key: VITE_SUPABASE_URL
         sync: false  # Set this manually in Render dashboard

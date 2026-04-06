@@ -1,2 +1,2 @@
-# SolMind Backend Package
+# Anymind Backend Package
 
