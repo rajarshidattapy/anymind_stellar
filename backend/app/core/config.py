@@ -106,6 +106,19 @@ class Settings(BaseSettings):
     SOLANA_RPC_URL: str = os.getenv("SOLANA_RPC_URL", "https://api.devnet.solana.com")
     SOLANA_NETWORK: str = os.getenv("SOLANA_NETWORK", "devnet")
     
+    # Stellar x402 Payments
+    STELLAR_PAY_TO_ADDRESS: str = os.getenv("STELLAR_PAY_TO_ADDRESS", "")
+    STELLAR_NETWORK: str = os.getenv("STELLAR_NETWORK", "stellar:testnet")
+    STELLAR_USDC_ASSET: str = os.getenv(
+        "STELLAR_USDC_ASSET",
+        "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75"
+    )
+    FACILITATOR_URL: str = os.getenv(
+        "FACILITATOR_URL",
+        "https://channels.openzeppelin.com/x402/testnet"
+    )
+    OZ_RELAYER_API_KEY: str = os.getenv("OZ_RELAYER_API_KEY", "")
+
     # JWT
     SECRET_KEY: str = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
     ALGORITHM: str = "HS256"

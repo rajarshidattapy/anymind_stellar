@@ -1,14 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Star, User, TrendingUp, MessageSquare, Play, ExternalLink, AlertCircle } from 'lucide-react';
+import { AlertCircle, ExternalLink, MessageSquare, Play, Star, TrendingUp, User } from 'lucide-react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { useApiClient } from '../lib/api';
+import { useStellarWallet } from '../contexts/StellarWalletContext';
 import { useCapsuleQuery } from '../hooks/useCapsuleQuery';
+import { useApiClient } from '../lib/api';
 import { getSolanaExplorerUrl } from '../utils/solanaPayment';
+import { getStellarExplorerUrl } from '../utils/stellarPayment';
 
 const CapsuleDetail = () => {
   const { id } = useParams();
   const { connected } = useWallet();
+  const {
+    address: stellarAddress,
+    connected: stellarConnected,
+    connecting: stellarConnecting,
+    connect: connectStellarWallet,
+  } = useStellarWallet();
   const apiClient = useApiClient();
   const { queryWithPayment, loading: queryLoading, error: queryError, clearError } = useCapsuleQuery();
 
@@ -19,10 +27,12 @@ const CapsuleDetail = () => {
   const [question, setQuestion] = useState('');
   const [queryResponse, setQueryResponse] = useState<string | null>(null);
   const [txSignature, setTxSignature] = useState<string | null>(null);
+  const [stellarTxHash, setStellarTxHash] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
-      fetchCapsule();
+      void fetchCapsule();
     }
   }, [id]);
 
@@ -35,7 +45,6 @@ const CapsuleDetail = () => {
     } catch (error) {
       console.error('Error fetching capsule:', error);
       setCapsuleError(error instanceof Error ? error.message : 'Failed to load capsule');
-      // Fallback to mock data for demo
       setCapsule({
         id,
         name: 'DeFi Yield Farming Expert',
@@ -44,7 +53,8 @@ const CapsuleDetail = () => {
         reputation: 98,
         stake_amount: 1200,
         price_per_query: 0.05,
-        description: 'Advanced yield farming strategies across multiple protocols with real-time risk assessment and opportunity identification.',
+        description:
+          'Advanced yield farming strategies across multiple protocols with real-time risk assessment and opportunity identification.',
         metadata: {
           knowledge: [
             'Multi-protocol yield optimization',
@@ -52,8 +62,8 @@ const CapsuleDetail = () => {
             'Risk assessment frameworks',
             'APY vs APR analysis',
             'Smart contract risk evaluation',
-            'Liquidity mining strategies'
-          ]
+            'Liquidity mining strategies',
+          ],
         },
         query_count: 1547,
         rating: 4.9,
@@ -63,9 +73,19 @@ const CapsuleDetail = () => {
     }
   };
 
+  const canQueryCapsule = connected || stellarConnected;
+
+  const shortenAddress = (address: string) => {
+    return `${address.slice(0, 4)}...${address.slice(-4)}`;
+  };
+
+  const handleConnectStellar = async () => {
+    await connectStellarWallet();
+  };
+
   const handleQuerySubmit = async () => {
-    if (!connected) {
-      alert('Please connect your wallet first');
+    if (!canQueryCapsule) {
+      alert('Please connect a Solana or Stellar wallet first');
       return;
     }
 
@@ -77,6 +97,8 @@ const CapsuleDetail = () => {
     clearError();
     setQueryResponse(null);
     setTxSignature(null);
+    setStellarTxHash(null);
+    setPaymentMethod(null);
 
     const result = await queryWithPayment(
       id!,
@@ -88,14 +110,16 @@ const CapsuleDetail = () => {
     if (result) {
       setQueryResponse(result.response);
       setTxSignature(result.txSignature || null);
+      setStellarTxHash(result.stellar_tx_hash || null);
+      setPaymentMethod(result.payment_method || null);
       setQuestion('');
     }
   };
 
   const exampleQuestions = [
-    "What are the best yield farming opportunities on Ethereum right now?",
-    "How do I calculate impermanent loss for an ETH/USDC pool?",
-    "What are the risks of providing liquidity to Curve pools?"
+    'What are the best yield farming opportunities on Ethereum right now?',
+    'How do I calculate impermanent loss for an ETH/USDC pool?',
+    'What are the risks of providing liquidity to Curve pools?',
   ];
 
   const mockReviews = [
@@ -103,16 +127,18 @@ const CapsuleDetail = () => {
       id: '1',
       user: 'DeFiTrader',
       rating: 5,
-      comment: 'Incredibly detailed analysis of yield farming opportunities. Helped me optimize my portfolio across 3 protocols.',
-      timestamp: '2 days ago'
+      comment:
+        'Incredibly detailed analysis of yield farming opportunities. Helped me optimize my portfolio across 3 protocols.',
+      timestamp: '2 days ago',
     },
     {
       id: '2',
       user: 'CryptoNovice',
       rating: 4,
-      comment: 'Great for understanding the basics of yield farming. Could use more beginner-friendly explanations.',
-      timestamp: '1 week ago'
-    }
+      comment:
+        'Great for understanding the basics of yield farming. Could use more beginner-friendly explanations.',
+      timestamp: '1 week ago',
+    },
   ];
 
   if (loadingCapsule) {
@@ -139,13 +165,10 @@ const CapsuleDetail = () => {
         {capsuleError && (
           <div className="bg-yellow-600 bg-opacity-20 border border-yellow-500 rounded-lg p-4 mb-4 flex items-start">
             <AlertCircle className="h-5 w-5 text-yellow-400 mr-3 mt-0.5" />
-            <div className="text-yellow-200 text-sm">
-              Note: Using demo data. {capsuleError}
-            </div>
+            <div className="text-yellow-200 text-sm">Note: Using demo data. {capsuleError}</div>
           </div>
         )}
 
-        {/* Header */}
         <div className="bg-gray-800 rounded-xl border border-gray-700 p-8 mb-8">
           <div className="flex justify-between items-start mb-6">
             <div>
@@ -172,9 +195,9 @@ const CapsuleDetail = () => {
             </div>
 
             <div className="text-right">
-              
-              <div className="text-2xl font-bold text-white mb-1">{capsule.price_per_query} SOL</div>
-              <div className="text-gray-400">per query</div>
+              <div className="text-2xl font-bold text-white mb-1">${capsule.price_per_query} USDC</div>
+              <div className="text-gray-400 text-sm">per query (Stellar x402)</div>
+              <div className="text-gray-500 text-xs mt-1">or {capsule.price_per_query} SOL (legacy)</div>
               <div className="mt-4 space-x-3">
                 <button
                   className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
@@ -221,18 +244,17 @@ const CapsuleDetail = () => {
           </div>
         </div>
 
-        {/* Tabs */}
         <div className="bg-gray-800 rounded-xl border border-gray-700">
           <div className="border-b border-gray-700">
             <div className="flex">
               {[
                 { id: 'overview', label: 'Overview' },
                 { id: 'trial', label: 'Try It Out' },
-                { id: 'reviews', label: 'Reviews' }
+                { id: 'reviews', label: 'Reviews' },
               ].map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => setActiveTab(tab.id as 'overview' | 'trial' | 'reviews')}
                   className={`px-6 py-4 font-medium transition-colors ${
                     activeTab === tab.id
                       ? 'border-b-2 border-blue-500 text-blue-400'
@@ -280,16 +302,34 @@ const CapsuleDetail = () => {
                   <h3 className="text-xl font-semibold text-white mb-2">Try This Capsule</h3>
                   <p className="text-gray-400">
                     {capsule.price_per_query > 0
-                      ? `Ask a question for ${capsule.price_per_query} SOL`
+                      ? `Ask a question for $${capsule.price_per_query} USDC via Stellar`
                       : 'Ask a question for free'}
                   </p>
+                  {capsule.price_per_query > 0 && (
+                    <div className="mt-3 space-y-3">
+                      <p className="text-gray-500 text-xs">
+                        {stellarConnected && stellarAddress
+                          ? `Stellar wallet connected for x402: ${shortenAddress(stellarAddress)}`
+                          : 'Connect a Stellar wallet for x402, or use a Solana wallet for the legacy fallback flow.'}
+                      </p>
+                      {!stellarConnected && (
+                        <button
+                          onClick={() => void handleConnectStellar()}
+                          disabled={stellarConnecting}
+                          className="inline-flex items-center justify-center rounded-lg border border-green-500/40 bg-green-500/10 px-4 py-2 text-sm font-medium text-green-300 transition-colors hover:bg-green-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {stellarConnecting ? 'Connecting Stellar...' : 'Connect Stellar Wallet'}
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
 
-                {!connected && (
+                {!canQueryCapsule && (
                   <div className="bg-yellow-600 bg-opacity-20 border border-yellow-500 rounded-lg p-4 mb-4 flex items-start">
                     <AlertCircle className="h-5 w-5 text-yellow-400 mr-3 mt-0.5" />
                     <div className="text-yellow-200">
-                      Please connect your wallet to query this capsule
+                      Connect a Solana or Stellar wallet to query this capsule
                     </div>
                   </div>
                 )}
@@ -305,16 +345,33 @@ const CapsuleDetail = () => {
                   <div className="bg-blue-600 bg-opacity-10 border border-blue-500 rounded-lg p-6 space-y-4">
                     <div className="flex items-center justify-between">
                       <h4 className="text-blue-400 font-semibold">Response:</h4>
-                      {txSignature && (
-                        <a
-                          href={getSolanaExplorerUrl(txSignature, 'devnet')}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center text-sm text-blue-400 hover:text-blue-300"
-                        >
-                          View Transaction <ExternalLink className="h-4 w-4 ml-1" />
-                        </a>
-                      )}
+                      <div className="flex items-center gap-3">
+                        {paymentMethod && (
+                          <span className="text-xs px-2 py-1 rounded bg-gray-700 text-gray-300">
+                            Paid via {paymentMethod === 'stellar_x402' ? 'Stellar USDC' : 'Solana SOL'}
+                          </span>
+                        )}
+                        {txSignature && (
+                          <a
+                            href={getSolanaExplorerUrl(txSignature, 'devnet')}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center text-sm text-blue-400 hover:text-blue-300"
+                          >
+                            View on Solana <ExternalLink className="h-4 w-4 ml-1" />
+                          </a>
+                        )}
+                        {stellarTxHash && (
+                          <a
+                            href={getStellarExplorerUrl(stellarTxHash)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center text-sm text-blue-400 hover:text-blue-300"
+                          >
+                            View on Stellar <ExternalLink className="h-4 w-4 ml-1" />
+                          </a>
+                        )}
+                      </div>
                     </div>
                     <p className="text-gray-300">{queryResponse}</p>
                   </div>
@@ -322,14 +379,14 @@ const CapsuleDetail = () => {
 
                 <div className="space-y-3">
                   <h4 className="text-white font-medium">Example Questions:</h4>
-                  {exampleQuestions.map((q, index) => (
+                  {exampleQuestions.map((exampleQuestion, index) => (
                     <button
                       key={index}
-                      onClick={() => setQuestion(q)}
+                      onClick={() => setQuestion(exampleQuestion)}
                       className="w-full bg-gray-700 hover:bg-gray-600 text-left text-gray-300 p-4 rounded-lg transition-colors flex items-center justify-between"
                       disabled={queryLoading}
                     >
-                      <span>{q}</span>
+                      <span>{exampleQuestion}</span>
                       <MessageSquare className="h-5 w-5 text-gray-500" />
                     </button>
                   ))}
@@ -341,16 +398,20 @@ const CapsuleDetail = () => {
                     type="text"
                     placeholder="Ask your own question..."
                     value={question}
-                    onChange={(e) => setQuestion(e.target.value)}
-                    disabled={queryLoading || !connected}
+                    onChange={(event) => setQuestion(event.target.value)}
+                    disabled={queryLoading || !canQueryCapsule}
                     className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none mb-4 disabled:opacity-50"
                   />
                   <button
                     onClick={handleQuerySubmit}
-                    disabled={queryLoading || !connected || !question.trim()}
+                    disabled={queryLoading || !canQueryCapsule || !question.trim()}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full"
                   >
-                    {queryLoading ? 'Processing Payment & Query...' : `Ask Question (${capsule.price_per_query} SOL)`}
+                    {queryLoading
+                      ? 'Processing Payment & Query...'
+                      : capsule.price_per_query > 0
+                        ? `Ask Question ($${capsule.price_per_query} USDC)`
+                        : 'Ask Question (Free)'}
                   </button>
                 </div>
               </div>
@@ -378,11 +439,11 @@ const CapsuleDetail = () => {
                           <span className="text-white font-medium">{review.user}</span>
                         </div>
                         <div className="flex items-center space-x-1">
-                          {[...Array(5)].map((_, i) => (
+                          {[...Array(5)].map((_, index) => (
                             <Star
-                              key={i}
+                              key={index}
                               className={`h-4 w-4 ${
-                                i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-500'
+                                index < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-500'
                               }`}
                             />
                           ))}
@@ -399,8 +460,11 @@ const CapsuleDetail = () => {
                   <div className="space-y-4">
                     <div className="flex items-center space-x-2">
                       <span className="text-gray-400">Rating:</span>
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="h-5 w-5 text-gray-500 hover:text-yellow-400 cursor-pointer" />
+                      {[...Array(5)].map((_, index) => (
+                        <Star
+                          key={index}
+                          className="h-5 w-5 text-gray-500 hover:text-yellow-400 cursor-pointer"
+                        />
                       ))}
                     </div>
                     <textarea

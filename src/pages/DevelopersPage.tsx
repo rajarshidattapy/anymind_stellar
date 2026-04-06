@@ -96,7 +96,7 @@ print(response)`;
               <h1 className="text-5xl font-bold tracking-tight">Developer Documentation</h1>
             </div>
             <p className="text-xl text-gray-400 max-w-2xl">
-              Build powerful AI applications with Anymind's SDK. Integrate persistent memory capsules into your projects with just a few lines of code.
+              Build powerful AI applications with Anymind's SDK. Integrate persistent memory capsules into your projects with just a few lines of code. Pay per query with Stellar x402 USDC micropayments — zero gas fees.
             </p>
           </div>
 
@@ -303,6 +303,96 @@ print(response)`;
                   <p className="text-sm text-gray-500">
                     Stay tuned for updates. The NPM SDK will be available in a future release.
                   </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* x402 Payments Section */}
+          <section className="mb-16">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 rounded-lg bg-blue-600/10 flex items-center justify-center">
+                <Zap className="w-5 h-5 text-blue-400" />
+              </div>
+              <h2 className="text-3xl font-bold">Stellar x402 Payments</h2>
+              <span className="px-3 py-1 bg-green-600/20 text-green-400 text-sm font-medium rounded-full">
+                Live on Testnet
+              </span>
+            </div>
+
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-8 mb-8">
+              <h3 className="text-xl font-semibold mb-4">Pay-per-Query with USDC</h3>
+              <p className="text-gray-400 mb-6 leading-relaxed">
+                Anymind uses the <strong className="text-white">x402 protocol</strong> (by Coinbase) for capsule payments.
+                When you query a capsule, the server returns a 402 challenge. Your client signs a Stellar USDC transfer,
+                and the facilitator settles it on-chain. <strong className="text-white">Zero gas fees</strong> for buyers —
+                the OZ Channels facilitator sponsors all Stellar network fees.
+              </p>
+
+              <div className="grid md:grid-cols-3 gap-4 mb-6">
+                <div className="bg-gray-700 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-blue-400 mb-1">$0</div>
+                  <div className="text-xs text-gray-400">Gas fees for buyers</div>
+                </div>
+                <div className="bg-gray-700 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-green-400 mb-1">&lt;5s</div>
+                  <div className="text-xs text-gray-400">Settlement time</div>
+                </div>
+                <div className="bg-gray-700 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-purple-400 mb-1">USDC</div>
+                  <div className="text-xs text-gray-400">Stablecoin payments</div>
+                </div>
+              </div>
+
+              <h4 className="text-lg font-semibold text-white mb-3">How It Works</h4>
+              <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 font-mono text-sm leading-relaxed overflow-x-auto">
+                <div className="text-gray-400">{'// 1. Query a capsule — get 402 challenge'}</div>
+                <div><span className="text-blue-400">POST</span> /api/v1/capsules/{'{id}'}/query</div>
+                <div className="text-gray-500">{'← 402 { x402Version: 2, accepts: [{ network: "stellar:testnet", amount: "10000", ... }] }'}</div>
+                <div className="mt-2 text-gray-400">{'// 2. Sign Soroban USDC auth entries (Freighter wallet)'}</div>
+                <div className="mt-2 text-gray-400">{'// 3. Retry with X-PAYMENT header'}</div>
+                <div><span className="text-blue-400">POST</span> /api/v1/capsules/{'{id}'}/query</div>
+                <div className="text-gray-500">  Headers: {'{ "X-PAYMENT": "<base64-encoded-payment>" }'}</div>
+                <div className="text-gray-500">{'← 200 { response: "...", payment: { tx_hash, payer, amount_usdc } }'}</div>
+              </div>
+            </div>
+
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-8">
+              <h3 className="text-xl font-semibold mb-4">Wallet Requirements</h3>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="text-white font-medium mb-2">For Buyers (Querying Capsules)</h4>
+                  <ul className="space-y-2 text-gray-400 text-sm">
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-400 mt-0.5">1.</span>
+                      <span>Install <strong className="text-white">Freighter</strong> browser extension</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-400 mt-0.5">2.</span>
+                      <span>Fund with testnet USDC (no XLM needed for payments)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-400 mt-0.5">3.</span>
+                      <span>Query any capsule — payment is automatic</span>
+                    </li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="text-white font-medium mb-2">For Sellers (Capsule Creators)</h4>
+                  <ul className="space-y-2 text-gray-400 text-sm">
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-400 mt-0.5">1.</span>
+                      <span>Set <code className="bg-gray-700 px-1 rounded text-xs">STELLAR_PAY_TO_ADDRESS</code> to your G... address</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-400 mt-0.5">2.</span>
+                      <span>Set capsule price — earnings arrive in USDC automatically</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-400 mt-0.5">3.</span>
+                      <span>Solana payment fallback is supported for non-Stellar users</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>

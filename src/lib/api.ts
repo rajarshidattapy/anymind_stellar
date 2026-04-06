@@ -265,11 +265,40 @@ export class ApiClient {
     prompt: string;
     payment_signature?: string;
     amount_paid?: number;
-  }) {
+  }, extraHeaders?: Record<string, string>) {
     return this.request(`/api/v1/capsules/${encodeURIComponent(capsuleId)}/query`, {
       method: 'POST',
       body: JSON.stringify(payload),
+      headers: extraHeaders,
     });
+  }
+
+  /**
+   * Raw fetch for capsule query — returns the Response object
+   * so callers can inspect the status code (e.g. 402).
+   */
+  async queryCapsuleRaw(capsuleId: string, payload: {
+    prompt: string;
+    payment_signature?: string;
+    amount_paid?: number;
+  }, extraHeaders?: Record<string, string>): Promise<Response> {
+    const walletAddress = this.getWalletAddress();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...extraHeaders,
+    };
+    if (walletAddress) {
+      headers['X-Wallet-Address'] = walletAddress;
+    }
+
+    return fetch(
+      `${this.baseUrl}/api/v1/capsules/${encodeURIComponent(capsuleId)}/query`,
+      {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(payload),
+      }
+    );
   }
 
   // Marketplace

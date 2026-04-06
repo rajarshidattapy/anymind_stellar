@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { useStellarWallet } from '../contexts/StellarWalletContext';
 import {
   MessageSquare,
   Package,
@@ -20,9 +21,18 @@ import { useSolanaBalance } from "../hooks/useSolanaBalance";
 
 export default function LandingPage() {
   const { connected, publicKey, disconnect } = useWallet();
+  const {
+    address: stellarAddress,
+    connected: stellarConnected,
+    connecting: stellarConnecting,
+    connect: connectStellarWallet,
+    disconnect: disconnectStellarWallet,
+  } = useStellarWallet();
   const { balance, loading } = useSolanaBalance();
   const [showDisconnect, setShowDisconnect] = useState(false);
+  const [showStellarDisconnect, setShowStellarDisconnect] = useState(false);
   const disconnectRef = useRef<HTMLDivElement>(null);
+  const stellarDisconnectRef = useRef<HTMLDivElement>(null);
 
   const shortenAddress = (address: string) => {
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
@@ -34,16 +44,23 @@ export default function LandingPage() {
       if (disconnectRef.current && !disconnectRef.current.contains(event.target as Node)) {
         setShowDisconnect(false);
       }
+      if (stellarDisconnectRef.current && !stellarDisconnectRef.current.contains(event.target as Node)) {
+        setShowStellarDisconnect(false);
+      }
     };
 
-    if (showDisconnect) {
+    if (showDisconnect || showStellarDisconnect) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showDisconnect]);
+  }, [showDisconnect, showStellarDisconnect]);
+
+  const handleStellarConnect = async () => {
+    await connectStellarWallet();
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
@@ -65,6 +82,37 @@ export default function LandingPage() {
             </Link>
           </nav>
           <div className="flex items-center gap-4">
+            {stellarConnected && stellarAddress ? (
+              <div className="relative" ref={stellarDisconnectRef}>
+                <button
+                  onClick={() => setShowStellarDisconnect(!showStellarDisconnect)}
+                  className="border border-green-500/40 bg-green-500/10 text-green-300 px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-green-500/20"
+                >
+                  Stellar {shortenAddress(stellarAddress)}
+                </button>
+                {showStellarDisconnect && (
+                  <div className="absolute top-full right-0 mt-1 z-50">
+                    <button
+                      onClick={() => {
+                        void disconnectStellarWallet();
+                        setShowStellarDisconnect(false);
+                      }}
+                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap w-full"
+                    >
+                      Disconnect Stellar
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => void handleStellarConnect()}
+                disabled={stellarConnecting}
+                className="border border-green-500/40 bg-green-500/10 text-green-300 px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-green-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {stellarConnecting ? 'Connecting...' : 'Connect Stellar'}
+              </button>
+            )}
             {connected && publicKey ? (
               <div className="flex items-center gap-3">
                 <div className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 flex items-center gap-2">
@@ -112,8 +160,8 @@ export default function LandingPage() {
             Turn AI conversations into <span className="text-blue-400">on-chain intelligence.</span>
           </h1>
           <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
-            Anymind is a Solana-native AI intelligence marketplace. Chat with agents, package long-term intelligence
-            into capsules, and monetize them as revenue-generating assets.
+            Anymind is an AI intelligence marketplace powered by Solana and Stellar. Chat with agents, package long-term intelligence
+            into capsules, and monetize them with x402 micropayments in USDC — zero gas fees for buyers.
           </p>
           <div className="flex flex-row items-center justify-center gap-6 mt-8">
             {connected ? (
@@ -314,8 +362,8 @@ export default function LandingPage() {
                     </div>
                     <h3 className="text-2xl font-bold mb-4">4. Monetize</h3>
                     <p className="text-gray-400 leading-relaxed">
-                      Each query to your capsule triggers a lightning-fast Solana micropayment. Permissionless,
-                      transparent, and direct.
+                      Each query triggers a Stellar x402 USDC micropayment — zero gas fees for buyers,
+                      sub-5s settlement, fully permissionless. Solana staking for reputation.
                     </p>
                   </div>
                   <div className="bg-blue-600 p-8 flex flex-col items-center justify-center text-white text-center">
