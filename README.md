@@ -1,6 +1,6 @@
 # Anymind 🧠
 
-**Anymind is a full-stack AI agent runtime for creating, monetizing, and distributing intelligence.**
+**Anymind is a AI agent runtime for creating, monetizing, and distributing intelligence.**
 
 It enables developers and creators to build stateful AI agents, package their intelligence into reusable memory capsules, and monetize access through programmable micropayments.
 
