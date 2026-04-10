@@ -63,7 +63,7 @@ export default function LandingPage() {
               How it Works
             </a>
             <Link to="/developers" className="hover:text-gray-100 transition-colors">
-              Developers
+              Docs
             </Link>
           </nav>
           <div className="flex items-center gap-4">
@@ -275,19 +275,44 @@ export default function LandingPage() {
                       reusable reasoning patterns as you go.
                     </p>
                   </div>
-                  <div className="bg-gray-700/50 p-8 flex items-center justify-center">
-                    <div className="space-y-3 w-full">
-                      {[1, 2, 3].map((index) => (
-                        <div
-                          key={index}
-                          className={`p-3 rounded-lg border border-gray-800 bg-gray-900 shadow-sm ${index === 2 ? 'translate-x-4 border-blue-600/20 bg-blue-600/5' : ''}`}
-                        >
-                          <div className="flex gap-3">
-                            <div className="w-6 h-6 rounded-full bg-gray-700 shrink-0" />
-                            <div className="h-4 bg-gray-700 rounded w-3/4" />
-                          </div>
+                  <div className="bg-gradient-to-b from-gray-700/30 to-gray-800/50 p-8 flex flex-col gap-4 overflow-hidden">
+                    {/* Assistant Message */}
+                    <div className="flex gap-2 items-end">
+                      <div className="w-6 h-6 rounded-full bg-blue-600/20 border border-blue-600/30 shrink-0 flex items-center justify-center">
+                        <div className="w-2 h-2 rounded-full bg-blue-400" />
+                      </div>
+                      <div className="max-w-xs">
+                        <div className="bg-gray-700/60 border border-gray-600/40 rounded-lg p-3 backdrop-blur-sm">
+                          <div className="h-3 bg-gray-500 rounded w-48 mb-2" />
+                          <div className="h-3 bg-gray-500 rounded w-40" />
                         </div>
-                      ))}
+                      </div>
+                    </div>
+
+                    {/* User Message */}
+                    <div className="flex gap-2 items-end justify-end">
+                      <div className="max-w-xs">
+                        <div className="bg-blue-600/40 border border-blue-500/30 rounded-lg p-3 backdrop-blur-sm">
+                          <div className="h-3 bg-blue-300/60 rounded w-44" />
+                        </div>
+                      </div>
+                      <div className="w-6 h-6 rounded-full bg-green-600/20 border border-green-500/30 shrink-0 flex items-center justify-center">
+                        <div className="w-2 h-2 rounded-full bg-green-400" />
+                      </div>
+                    </div>
+
+                    {/* Assistant Message */}
+                    <div className="flex gap-2 items-end">
+                      <div className="w-6 h-6 rounded-full bg-blue-600/20 border border-blue-600/30 shrink-0 flex items-center justify-center">
+                        <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                      </div>
+                      <div className="max-w-xs">
+                        <div className="bg-gray-700/60 border border-gray-600/40 rounded-lg p-3 backdrop-blur-sm">
+                          <div className="h-3 bg-gray-500 rounded w-52 mb-2" />
+                          <div className="h-3 bg-gray-500 rounded w-44 mb-2" />
+                          <div className="h-3 bg-gray-500 rounded w-32" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

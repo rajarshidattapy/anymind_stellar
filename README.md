@@ -15,6 +15,8 @@ Built across **AI infra + Web3 rails + developer tooling**, Anymind combines:
 
 ---
 
+![alt text](src/assets/image.png)
+
 ## Why Anymind?
 
 Most AI products stop at conversations.
