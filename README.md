@@ -1,20 +1,17 @@
 # Anymind 🧠
 
-**Anymind is a AI agent runtime for creating, monetizing, and distributing intelligence.**
+**Anymind is an AI agent runtime for creating, monetizing, and distributing intelligence.**
 
 It enables developers and creators to build stateful AI agents, package their intelligence into reusable memory capsules, and monetize access through programmable micropayments.
 
 Built across **AI infra + Web3 rails + developer tooling**, Anymind combines:
 
-- **Stellar** for wallet-authenticated identity, staking signals, and reputation
+- **Stellar** for wallet-authenticated identity, on-chain staking, and reputation
+- **Soroban** smart contracts for capsule creation, staking, and earnings
 - **Stellar x402** for USDC micropayments with sponsored fees
 - **FastAPI + Supabase + Redis** for backend orchestration and state
 - **React + Vite** for a fast, wallet-native frontend
 - **Python SDK** for programmatic agent access
-
-This is not another chat UI.
-
-It is a runtime layer for **persistent, portable, and monetizable intelligence**.
 
 ---
 
@@ -30,7 +27,7 @@ With Anymind, intelligence can be:
 - **persisted** as memory capsules
 - **published** to a marketplace
 - **queried** through paid access
-- **staked** for reputation and discovery
+- **staked** on-chain for reputation and discovery
 - **integrated** via SDKs into external applications
 
 This turns agents from temporary chats into **long-lived economic entities**.
@@ -50,8 +47,7 @@ Agents support:
 - session memory
 - stateful backend interaction
 - wallet-aware identity
-
----
+- on-chain registration via Soroban
 
 ### 2. Memory Capsules
 
@@ -66,9 +62,7 @@ Each capsule includes:
 - creator reputation
 - marketplace visibility
 
-Think of capsules as **portable intelligence assets**.
-
----
+Think of capsules as **portable intelligence assets** anchored on-chain.
 
 ### 3. Marketplace
 
@@ -81,8 +75,6 @@ Users can:
 - query paid intelligence
 - access premium agent memory
 
----
-
 ### 4. Payment Rails
 
 Anymind supports dual payment paths.
@@ -93,22 +85,22 @@ Fast programmable micropayments with sponsored fees.
 
 Flow:
 
-Client request  
-→ `402 Payment Required`  
-→ wallet signature  
-→ `X-PAYMENT` header  
-→ facilitator settlement  
+```
+Client request
+→ 402 Payment Required
+→ wallet signature
+→ X-PAYMENT header
+→ facilitator settlement
 → response delivery
+```
 
 #### Wallet Flow
 
 Stellar Wallets Kit powers connection, account identity, and signing across the frontend.
 
----
-
 ### 5. Staking + Reputation
 
-Creators and capsules can participate in Stellar-first staking flows.
+Staking is recorded on-chain via the Anymind Soroban contract on Stellar testnet.
 
 Staking powers:
 
@@ -117,7 +109,7 @@ Staking powers:
 - creator trust
 - discovery visibility
 
-This creates an economic trust layer around intelligence.
+On first stake, a **capsule** is created on-chain for the agent. Subsequent stakes accumulate on the same capsule. Earnings can be withdrawn on-chain via `withdraw_earnings`.
 
 ---
 
@@ -130,7 +122,7 @@ This creates an economic trust layer around intelligence.
 - Vite
 - Tailwind CSS
 - Stellar Wallets Kit
-- Stellar Wallets Kit
+- `@stellar/stellar-sdk` (contract client)
 
 ### Backend
 
@@ -144,7 +136,8 @@ This creates an economic trust layer around intelligence.
 ### Blockchain + Payments
 
 - Stellar testnet
-- Soroban migration in progress
+- Soroban smart contract (`contracts/`)
+- TypeScript bindings (`bindings/`)
 - Stellar x402
 - OpenZeppelin Channels facilitator
 
@@ -154,26 +147,78 @@ This creates an economic trust layer around intelligence.
 
 ```text
 .
-├── src/                     Frontend application
-│   ├── components/          Shared UI components
-│   ├── contexts/            Wallet + global state
-│   ├── hooks/               Custom React hooks
-│   ├── pages/               Main product screens
-│   └── utils/               Payments + helpers
+├── src/                       Frontend application
+│   ├── components/            Shared UI components
+│   ├── contexts/              Wallet + global state
+│   ├── hooks/
+│   │   ├── useContract.ts     Soroban contract hook (stake, register, earnings)
+│   │   └── ...
+│   ├── lib/
+│   │   ├── contract.ts        AnymindClient + signing factory
+│   │   ├── api.ts             Backend REST client
+│   │   └── ...
+│   ├── pages/                 Main product screens
+│   └── utils/                 Payments + helpers
 │
-├── backend/                 FastAPI backend
+├── contracts/                 Soroban smart contract (Rust)
+│   └── src/lib.rs             register_agent, create_capsule, stake_on_capsule,
+│                              withdraw_earnings, update_capsule_price
+│
+├── bindings/                  Auto-generated TypeScript contract bindings
+│   └── src/index.ts           Typed Client + ContractSpec XDR
+│
+├── backend/                   FastAPI backend
 │   ├── app/
-│   │   ├── api/             REST endpoints
-│   │   ├── core/            Settings + auth
-│   │   ├── db/              Database setup
-│   │   ├── models/          Pydantic schemas
-│   │   └── services/        Core business logic
-│   └── supabase/            SQL migrations
+│   │   ├── api/               REST endpoints
+│   │   ├── core/              Settings + auth
+│   │   ├── db/                Database setup
+│   │   ├── models/            Pydantic schemas
+│   │   └── services/          Core business logic
+│   └── supabase/              SQL migrations
 │
-├── contracts/               Legacy contracts / migration work
-├── anymind-sdk/             Python SDK
-├── wallet.md
+├── anymind-sdk/               Python SDK
 └── vercel.json
+```
+
+---
+
+## Smart Contract
+
+The Anymind contract is deployed on **Stellar testnet**.
+
+**Contract ID:** `CBD3R6PVDQ5PDDSNV344HZQQXYAAXOIZSEDRYXIPD3KRV5MPCLDOGVPJ`
+
+### Methods
+
+| Method | Description |
+|---|---|
+| `register_agent` | Register an AI agent on-chain |
+| `create_capsule` | Create a memory capsule with pricing |
+| `stake_on_capsule` | Stake XLM on a capsule (min 0.1 XLM, max 100,000 XLM) |
+| `withdraw_earnings` | Withdraw accumulated query earnings |
+| `update_capsule_price` | Update the price per query for a capsule |
+
+### Build + Deploy
+
+```bash
+cd contracts
+cargo build --target wasm32-unknown-unknown --release
+stellar contract deploy \
+  --wasm target/wasm32-unknown-unknown/release/anymind.wasm \
+  --network testnet
+```
+
+### Bindings
+
+The `bindings/` package contains auto-generated TypeScript bindings for the contract.
+The frontend uses them inline via `src/lib/contract.ts` (no separate build step required).
+
+```ts
+import { createSignedClient } from './lib/contract'
+
+const client = createSignedClient(walletPublicKey)
+const tx = await client.stake_on_capsule({ staker, capsule_id, amount })
+await tx.signAndSend()
 ```
 
 ---
@@ -188,46 +233,32 @@ This creates an economic trust layer around intelligence.
 - Supabase project
 - Redis / Upstash / Vercel KV
 - LLM provider API key
-
-Optional:
-
-- Freighter or another Stellar-compatible wallet
-- Stellar-compatible wallet
+- Freighter or another Stellar-compatible wallet (for on-chain features)
 
 ---
 
-## 1. Install Frontend
+### 1. Install Frontend
 
 ```bash
 npm install
 ```
 
-PowerShell:
-
-```powershell
-npm.cmd install
-```
-
----
-
-## 2. Install Backend
+### 2. Install Backend
 
 ```bash
 cd backend
 pip install -r requirements.txt
 ```
 
----
+### 3. Configure Environment Variables
 
-## 3. Configure Environment Variables
-
-### Frontend
+**Frontend** (`.env`):
 
 ```env
 VITE_API_BASE_URL=http://localhost:8000
 ```
 
-### Backend
+**Backend** (`.env`):
 
 ```env
 DEBUG=True
@@ -240,47 +271,29 @@ MEM0_API_KEY=...
 TAVILY_API_KEY=...
 
 STELLAR_HORIZON_URL=https://horizon-testnet.stellar.org
-
 STELLAR_PAY_TO_ADDRESS=...
 STELLAR_NETWORK=stellar:testnet
 FACILITATOR_URL=https://channels.openzeppelin.com/x402/testnet
 ```
 
-Use:
+Use `env.example` and `backend/env.example` as reference templates.
 
-- `env.example`
-- `backend/env.example`
-
-as reference templates.
-
----
-
-## 4. Run Backend
+### 4. Run Backend
 
 ```bash
 cd backend
 python main.py
 ```
 
-Backend runs at:
+Runs at `http://localhost:8000`
 
-```text
-http://localhost:8000
-```
-
----
-
-## 5. Run Frontend
+### 5. Run Frontend
 
 ```bash
 npm run dev
 ```
 
-Frontend runs at:
-
-```text
-http://localhost:5173
-```
+Runs at `http://localhost:8080`
 
 ---
 
@@ -298,9 +311,9 @@ http://localhost:5173
 
 ## Backend API
 
-- `/docs`
-- `/redoc`
-- `/health`
+- `/docs` — Swagger UI
+- `/redoc` — ReDoc
+- `/health` — Health check
 
 ### Route Groups
 
@@ -313,30 +326,9 @@ http://localhost:5173
 
 ---
 
-## Smart Contracts
-
-Programs live inside `contracts/`.
-
-Build + deploy:
-
-```bash
-cd contracts/solmind-staking
-anchor build
-anchor deploy
-```
-
----
-
 ## Python SDK
 
-The `anymind-sdk/` package enables agent access from:
-
-- scripts
-- external backends
-- automations
-- third-party products
-
-This makes Anymind portable beyond the web app.
+The `anymind-sdk/` package enables agent access from scripts, external backends, automations, and third-party products.
 
 ---
 
@@ -344,26 +336,23 @@ This makes Anymind portable beyond the web app.
 
 ### Frontend
 
-- Vercel
+- Vercel (`vercel.json` included)
 
 ### Backend
 
-- Render
-- Dockerized deployment support
-
-Files:
-
-- `backend/render.yaml`
-- `backend/Dockerfile`
+- Render (`backend/render.yaml`)
+- Docker (`backend/Dockerfile`)
 
 ---
 
 ## Known Gotchas
 
-- frontend requires `VITE_API_BASE_URL`
-- backend expects Supabase + Redis for full functionality
-- advanced memory flows degrade gracefully without optional services
-- PowerShell may require `npm.cmd`
+- Frontend requires `VITE_API_BASE_URL`
+- Backend expects Supabase + Redis for full functionality
+- Advanced memory flows degrade gracefully without optional services
+- On-chain staking requires a Stellar-compatible wallet (Freighter, Lobstr, etc.)
+- Contract amounts are in stroops (1 XLM = 10,000,000 stroops); the frontend converts automatically
+- PowerShell may require `npm.cmd` instead of `npm`
 
 ---
 
