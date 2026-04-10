@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { TrendingUp, Shield, Star, Coins, Plus, AlertCircle, Loader2 } from 'lucide-react';
+import { TrendingUp, Shield, Star, Coins, Plus, AlertCircle, Loader2, ExternalLink } from 'lucide-react';
 import { useApiClient } from '../lib/api';
 import { useWallet } from '../contexts/WalletContextProvider';
+import { useContract } from '../hooks/useContract';
+import { getStellarExplorerUrl } from '../utils/stellarPayment';
 
 interface Agent {
   id: string;
@@ -23,6 +25,7 @@ interface StakingInfo {
 const Staking = () => {
   const { publicKey, connected, connecting, connect } = useWallet();
   const apiClient = useApiClient();
+  const contract = useContract();
 
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loadingAgents, setLoadingAgents] = useState(true);
@@ -30,6 +33,7 @@ const Staking = () => {
   const [loadingStaking, setLoadingStaking] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
   const [stakeAmounts, setStakeAmounts] = useState<Record<string, string>>({});
+  const [txHashes, setTxHashes] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (connected && publicKey) {
@@ -66,7 +70,7 @@ const Staking = () => {
     }
   };
 
-  const handleStake = async (agentId: string, agentName: string) => {
+  const handleStake = async (agentId: string, agentName: string, platform: string) => {
     if (!connected || !publicKey) {
       setError('Please connect your Stellar wallet first');
       return;
@@ -80,24 +84,48 @@ const Staking = () => {
       return;
     }
 
+    if (amount < 0.1) {
+      setError('Minimum stake is 0.1 XLM');
+      return;
+    }
+
     setLoadingStaking((prev) => ({ ...prev, [agentId]: true }));
     setError(null);
 
     try {
-      const stakeResponse = await apiClient.stakeOnAgent(agentId, {
-        stake_amount: amount,
-        price_per_query: 0.05,
+      // Step 1: Record stake on-chain via Soroban contract
+      const { txHash, capsuleId } = await contract.stakeOnAgent({
+        agentId,
+        agentName,
         category: 'General',
         description: `Memory capsule for ${agentName}`,
-      }) as any;
+        xlmAmount: amount,
+        pricePerQueryXlm: 0.05,
+      });
+
+      if (txHash) {
+        setTxHashes((prev) => ({ ...prev, [agentId]: txHash }));
+      }
+
+      // Step 2: Inform backend for off-chain tracking
+      try {
+        await apiClient.stakeOnAgent(agentId, {
+          stake_amount: amount,
+          price_per_query: 0.05,
+          category: 'General',
+          description: `Memory capsule for ${agentName}`,
+        });
+      } catch (backendErr) {
+        // Backend sync failure is non-fatal; on-chain stake is the source of truth
+        console.warn('Backend stake sync failed (on-chain stake succeeded):', backendErr);
+      }
 
       await fetchStakingInfo();
       await fetchAgents();
-
       setStakeAmounts((prev) => ({ ...prev, [agentId]: '' }));
 
+      // Update local capsule registry for marketplace display
       try {
-        const capsuleId = stakeResponse?.capsule_id || `staked-${Date.now()}`;
         const stakedCapsule = {
           id: capsuleId,
           name: agentName,
@@ -110,19 +138,19 @@ const Staking = () => {
           query_count: 0,
           rating: 0,
           agent_id: agentId,
+          platform,
           staked_at: new Date().toISOString(),
+          tx_hash: txHash,
         };
 
-        const existingStaked = JSON.parse(localStorage.getItem('staked_capsules') || '[]');
-        const filtered = existingStaked.filter((capsule: any) => capsule.agent_id !== agentId);
+        const existingStaked = JSON.parse(localStorage.getItem('staked_capsules') || '[]') as typeof stakedCapsule[];
+        const filtered = existingStaked.filter((capsule) => capsule.agent_id !== agentId);
         filtered.push(stakedCapsule);
         localStorage.setItem('staked_capsules', JSON.stringify(filtered));
         window.dispatchEvent(new CustomEvent('capsuleStaked', { detail: stakedCapsule }));
       } catch (storageError) {
         console.error('Error storing staked capsule:', storageError);
       }
-
-      alert(`Recorded ${amount} XLM of backing on ${agentName}. Your capsule is now listed in the marketplace.`);
     } catch (nextError) {
       const message = nextError instanceof Error ? nextError.message : 'Staking failed';
       setError(message);
@@ -167,7 +195,8 @@ const Staking = () => {
         <div className="bg-blue-600 bg-opacity-10 border border-blue-500 rounded-lg p-4 mb-6 flex items-start">
           <AlertCircle className="h-5 w-5 text-blue-300 mr-3 mt-0.5" />
           <div className="text-blue-100 text-sm">
-            Stellar stake signals are tracked in-app while Soroban staking contracts are being finalized.
+            Stakes are recorded on the Stellar testnet via the Anymind Soroban contract. Contract ID:{' '}
+            <span className="font-mono text-xs break-all">CBD3R6PV…DOGVPJ</span>
           </div>
         </div>
 
@@ -267,7 +296,7 @@ const Staking = () => {
                         step="0.1"
                       />
                       <button
-                        onClick={() => void handleStake(agent.id, agent.display_name || agent.name)}
+                        onClick={() => void handleStake(agent.id, agent.display_name || agent.name, agent.platform)}
                         disabled={isStaking || !stakeAmount || Number.parseFloat(stakeAmount) <= 0}
                         className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                       >
@@ -293,6 +322,21 @@ const Staking = () => {
                         <div>Higher XLM backing improves marketplace visibility.</div>
                       </div>
                     </div>
+
+                    {txHashes[agent.id] && (
+                      <div className="mt-3 flex items-center space-x-2 text-xs text-green-400">
+                        <span>Last tx:</span>
+                        <span className="font-mono truncate max-w-xs">{txHashes[agent.id]}</span>
+                        <a
+                          href={getStellarExplorerUrl(txHashes[agent.id])}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-shrink-0 hover:text-green-300"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </div>
+                    )}
                   </div>
                 );
               })}
